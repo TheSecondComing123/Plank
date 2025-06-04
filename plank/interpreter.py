@@ -11,7 +11,7 @@ class Callable:
 	def __init__(self, params, body, closure_env, is_curried=False, applied_args=None):
 		self.params = params
 		self.body = body
-		self.closure_env = closure_env  # The scope where the lambda was defined
+		self.closure_env = closure_env	# The scope where the lambda was defined
 		self.is_curried = is_curried
 		self.applied_args = applied_args if applied_args is not None else []
 	
@@ -85,64 +85,64 @@ class Interpreter:
 		return last_result  # Return the result of the last statement/expression
 	
 	def visit_BinOp(self, node):
-	        """Evaluate binary operations and logical/comparison operators."""
-	        left_val = self.visit(node.left)
-	        right_val = self.visit(node.right)
+		"""Evaluate binary operations and logical/comparison operators."""
+		left_val = self.visit(node.left)
+		right_val = self.visit(node.right)
 
-	        match node.op.type:
-	                case TokenType.PLUS:
-	                        if isinstance(left_val, str) and isinstance(right_val, str):
-	                                return left_val + right_val
-	                        if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
-	                                return left_val + right_val
-	                        raise Exception(
-	                                f"Runtime error: Cannot perform '+' on types {type(left_val).__name__} and {type(right_val).__name__}")
+		match node.op.type:
+			case TokenType.PLUS:
+				if isinstance(left_val, str) and isinstance(right_val, str):
+					return left_val + right_val
+				if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
+					return left_val + right_val
+				raise Exception(
+					f"Runtime error: Cannot perform '+' on types {type(left_val).__name__} and {type(right_val).__name__}")
 
-	                case TokenType.MULTIPLY:
-	                        if isinstance(left_val, str) and isinstance(right_val, int):
-	                                return left_val * right_val
-	                        if isinstance(left_val, int) and isinstance(right_val, str):
-	                                return right_val * left_val
-	                        if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
-	                                return left_val * right_val
-	                        raise Exception(
-	                                f"Runtime error: Cannot perform '*' on types {type(left_val).__name__} and {type(right_val).__name__}")
+			case TokenType.MULTIPLY:
+				if isinstance(left_val, str) and isinstance(right_val, int):
+					return left_val * right_val
+				if isinstance(left_val, int) and isinstance(right_val, str):
+					return right_val * left_val
+				if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
+					return left_val * right_val
+				raise Exception(
+					f"Runtime error: Cannot perform '*' on types {type(left_val).__name__} and {type(right_val).__name__}")
 
-	                case TokenType.KEYWORD_AND:
-	                        return bool(left_val) and bool(right_val)
-	                case TokenType.KEYWORD_OR:
-	                        return bool(left_val) or bool(right_val)
+			case TokenType.KEYWORD_AND:
+				return bool(left_val) and bool(right_val)
+			case TokenType.KEYWORD_OR:
+				return bool(left_val) or bool(right_val)
 
-	                case TokenType.EQ:
-	                        return left_val == right_val
-	                case TokenType.NEQ:
-	                        return left_val != right_val
-	                case TokenType.LT:
-	                        return left_val < right_val
-	                case TokenType.GT:
-	                        return left_val > right_val
-	                case TokenType.LTE:
-	                        return left_val <= right_val
-	                case TokenType.GTE:
-	                        return left_val >= right_val
+			case TokenType.EQ:
+				return left_val == right_val
+			case TokenType.NEQ:
+				return left_val != right_val
+			case TokenType.LT:
+				return left_val < right_val
+			case TokenType.GT:
+				return left_val > right_val
+			case TokenType.LTE:
+				return left_val <= right_val
+			case TokenType.GTE:
+				return left_val >= right_val
 
-	                case TokenType.MINUS:
-	                        if not isinstance(left_val, (int, float)) or not isinstance(right_val, (int, float)):
-	                                raise Exception(
-	                                        f"Runtime error: Cannot perform arithmetic operation '-' on non-numeric types.")
-	                        return left_val - right_val
-	                case TokenType.DIVIDE:
-	                        if right_val == 0:
-	                                raise Exception("Runtime error: Division by zero")
-	                        return left_val / right_val
-	                case TokenType.FLOOR_DIVIDE:
-	                        if right_val == 0:
-	                                raise Exception("Runtime error: Division by zero")
-	                        return left_val // right_val
-	                case TokenType.EXPONENT:
-	                        return left_val ** right_val
-	                case _:
-	                        raise Exception(f"Runtime error: Unknown binary operator {node.op.value}")
+			case TokenType.MINUS:
+				if not isinstance(left_val, (int, float)) or not isinstance(right_val, (int, float)):
+					raise Exception(
+						f"Runtime error: Cannot perform arithmetic operation '-' on non-numeric types.")
+				return left_val - right_val
+			case TokenType.DIVIDE:
+				if right_val == 0:
+					raise Exception("Runtime error: Division by zero")
+				return left_val / right_val
+			case TokenType.FLOOR_DIVIDE:
+				if right_val == 0:
+					raise Exception("Runtime error: Division by zero")
+				return left_val // right_val
+			case TokenType.EXPONENT:
+				return left_val ** right_val
+			case _:
+				raise Exception(f"Runtime error: Unknown binary operator {node.op.value}")
 	
 	def visit_UnaryOp(self, node):
 		"""Evaluate unary operations."""
@@ -217,7 +217,7 @@ class Interpreter:
 		"""
 		# A copy of the current scope stack is taken to form the closure environment.
 		# This allows the lambda to access variables from where it was defined.
-		closure_env = list(self.scopes)  # Create a copy of the scope stack
+		closure_env = list(self.scopes)	 # Create a copy of the scope stack
 		return Callable(node.params, node.body, closure_env, is_curried=node.is_curried)
 	
 	def visit_Call(self, node):
@@ -235,7 +235,7 @@ class Interpreter:
 		if func_obj.is_curried and len(combined_args) < len(func_obj.params):
 			# Return a new partially applied callable
 			return Callable(func_obj.params, func_obj.body, func_obj.closure_env,
-			                is_curried=True, applied_args=combined_args)
+					is_curried=True, applied_args=combined_args)
 		
 		if len(combined_args) != len(func_obj.params):
 			raise Exception(
@@ -254,11 +254,11 @@ class Interpreter:
 		
 		result = None
 		try:
-			if isinstance(func_obj.body, Program):  # If body is a block of statements
+			if isinstance(func_obj.body, Program):	# If body is a block of statements
 				# Execute each statement in the block
 				# The result of the last expression in the block is the return value
 				for statement in func_obj.body.statements:
-					result = self.visit(statement)  # Update result with each statement's return
+					result = self.visit(statement)	# Update result with each statement's return
 			else:  # Body is a single expression
 				result = self.visit(func_obj.body)
 		finally:
@@ -309,7 +309,7 @@ class Interpreter:
 		else:
 			raise Exception(f"Runtime error: Unknown augmented assignment operator {node.op.value}")
 		
-		self.assign_variable(var_name, new_val)  # Use assign_variable
+		self.assign_variable(var_name, new_val)	 # Use assign_variable
 	
 	def visit_InputStatement(self, node):
 		"""
@@ -352,14 +352,18 @@ class Interpreter:
 		start_val = self.visit(node.start_expr)
 		end_val = self.visit(node.end_expr)
 		
-		if not isinstance(start_val, int) or not isinstance(end_val, int):
+		step_val = self.visit(node.step_expr) if node.step_expr is not None else 1
+		if not isinstance(start_val, int) or not isinstance(end_val, int) or not isinstance(step_val, int):
 			raise Exception("Runtime error: For loop range must be integers.")
+		if step_val == 0:
+			raise Exception("Runtime error: For loop step cannot be 0.")
 		
 		# Enter a new scope for the loop body
 		self.enter_scope()
 		
 		try:
-			for i in range(start_val, end_val + 1):
+			stop_val = end_val + (1 if step_val > 0 else -1)
+			for i in range(start_val, stop_val, step_val):
 				self.current_scope[loop_var_name] = i  # Loop var specific to this scope
 				for statement in node.body:
 					self.visit(statement)

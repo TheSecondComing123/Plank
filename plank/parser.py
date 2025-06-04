@@ -114,7 +114,7 @@ class Parser:
 			lexer_current_char_backup = self.lexer.current_char
 			parser_current_token_backup = self.current_token
 			try:
-				self.variable()  # Consume first IDENTIFIER
+				self.variable()	 # Consume first IDENTIFIER
 				while self.current_token.type == COMMA:
 					self.eat(COMMA)
 					self.variable()
@@ -136,7 +136,7 @@ class Parser:
 			lexer_current_char_backup = self.lexer.current_char
 			parser_current_token_backup = self.current_token
 			try:
-				self.variable()  # Consume IDENTIFIER
+				self.variable()	 # Consume IDENTIFIER
 				if self.current_token.type == ASSIGN:
 					self.lexer.pos = lexer_pos_backup
 					self.lexer.current_char = lexer_current_char_backup
@@ -223,23 +223,27 @@ class Parser:
 		"""
 		var_node = self.variable()
 		op_token = self.current_token
-		self.eat(op_token.type)  # Consume the augmented assignment operator
+		self.eat(op_token.type)	 # Consume the augmented assignment operator
 		expr_node = self.expression()
 		return AugmentedAssign(var_node, op_token, expr_node)
 	
 	def for_statement(self):
 		"""
 		Parses a for loop statement.
-		for_statement ::= LPAREN IDENTIFIER KEYWORD_FOR expression RANGE_OP expression RPAREN ARROW LBRACE (statement (SEMICOLON statement)*)* RBRACE
+		for_statement ::= LPAREN IDENTIFIER KEYWORD_FOR expression RANGE_OP expression (RANGE_OP expression)? RPAREN ARROW LBRACE (statement (SEMICOLON statement)*)* RBRACE
 		"""
 		self.eat(LPAREN)  # Consume '('
 		loop_var = self.variable()  # Get the loop variable (e.g., 'x')
 		self.eat(KEYWORD_FOR)  # Consume 'for'
-		start_expr = self.expression()  # Get the start expression (e.g., '1')
+		start_expr = self.expression()	# Get the start expression (e.g., '1')
 		self.eat(RANGE_OP)  # Consume '..'
 		end_expr = self.expression()  # Get the end expression (e.g., '5')
+		step_expr = None
+		if self.current_token.type == RANGE_OP:
+			self.eat(RANGE_OP)
+			step_expr = self.expression()
 		self.eat(RPAREN)  # Consume ')'
-		self.eat(ARROW)  # Consume '->'
+		self.eat(ARROW)	 # Consume '->'
 		self.eat(LBRACE)  # Consume '{'
 		
 		body_statements = []
@@ -252,7 +256,7 @@ class Parser:
 				if self.current_token.type != RBRACE and self.current_token.type != EOF:
 					body_statements.append(self.statement())
 		self.eat(RBRACE)  # Consume '}'
-		return ForStatement(loop_var, start_expr, end_expr, body_statements)
+		return ForStatement(loop_var, start_expr, end_expr, body_statements, step_expr)
 	
 	def while_statement(self):
 		"""
@@ -261,10 +265,10 @@ class Parser:
 		"""
 		self.eat(LPAREN)  # Consume '('
 		loop_var = self.variable()  # Consume the loop variable (e.g., 'x')
-		self.eat(KEYWORD_WHILE)  # Consume 'while'
+		self.eat(KEYWORD_WHILE)	 # Consume 'while'
 		condition = self.expression()  # Get the condition expression (e.g., 'x < 5')
 		self.eat(RPAREN)  # Consume ')'
-		self.eat(ARROW)  # Consume '->'
+		self.eat(ARROW)	 # Consume '->'
 		self.eat(LBRACE)  # Consume '{'
 		
 		body_statements = []
@@ -277,7 +281,7 @@ class Parser:
 		self.eat(RBRACE)  # Consume '}'
 		return WhileStatement(loop_var, condition, body_statements)
 	
-	def expression_statement(self):  # New: Parses an expression as a statement
+	def expression_statement(self):	 # New: Parses an expression as a statement
 		"""Parses an expression as a statement."""
 		node = self.expression()
 		return ExpressionStatement(node)
@@ -364,12 +368,12 @@ class Parser:
 		"""
 		node = self.primary()  # Start with a primary (variable, literal, lambda, etc.)
 		while self.current_token.type in (LBRACKET, LPAREN):
-			if self.current_token.type == LBRACKET:  # It's an index access
+			if self.current_token.type == LBRACKET:	 # It's an index access
 				self.eat(LBRACKET)
 				index_expr = self.expression()
 				self.eat(RBRACKET)
 				node = IndexAccess(node, index_expr)
-			elif self.current_token.type == LPAREN:  # It's a function call
+			elif self.current_token.type == LPAREN:	 # It's a function call
 				self.eat(LPAREN)
 				args = []
 				if self.current_token.type != RPAREN:  # Check if there are arguments
@@ -378,7 +382,7 @@ class Parser:
 						self.eat(COMMA)
 						args.append(self.expression())
 				self.eat(RPAREN)
-				node = Call(node, args)  # The node here is the function being called (e.g., Var('square'))
+				node = Call(node, args)	 # The node here is the function being called (e.g., Var('square'))
 		return node
 	
 	def primary(self):
@@ -504,7 +508,7 @@ class Parser:
 					if self.current_token.type != RBRACE and self.current_token.type != EOF:
 						body_statements.append(self.statement())
 			self.eat(RBRACE)
-			body = Program(body_statements)  # Body is a Program node
+			body = Program(body_statements)	 # Body is a Program node
 		else:
 			body = self.expression()  # Body is a single expression
 		

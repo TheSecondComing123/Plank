@@ -31,6 +31,7 @@ class TestPlankExamples(unittest.TestCase):
 			("out <- not true; out <- '\\n'", False),
 			# may just print
 			("(x for 1..3) -> { out <- x out <- ' ' }", None),
+                        ("total <- 0; (x for 2..10..2) -> { total +<- x }; out <- total", 30),
 			("x <- 0; (x while x < 5) -> { out <- x; x +<- 1; out <- '\\n' }", None),
 			("my_list <- [10, 'hello', true]; out <- my_list[1]; out <- '\\n'", 'hello'),
 			("my_list <- [10, 'hello', true]; my_list[0] <- 99; out <- my_list[0]; out <- '\n'", 99),

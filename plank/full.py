@@ -9,7 +9,7 @@ STRING = 'STRING'  # String literals (e.g., '"hello"', '" "')
 
 # Arithmetic Operators
 PLUS = 'PLUS'  # '+'
-MINUS = 'MINUS'  # '-'
+MINUS = 'MINUS'	 # '-'
 MULTIPLY = 'MULTIPLY'  # '*'
 DIVIDE = 'DIVIDE'  # '/'
 EXPONENT = 'EXPONENT'  # '**'
@@ -23,24 +23,24 @@ KEYWORD_OUT = 'KEYWORD_OUT'  # 'out' (for output statement)
 # For Loop Keywords and Operators
 KEYWORD_FOR = 'KEYWORD_FOR'  # 'for'
 RANGE_OP = 'RANGE_OP'  # '..'
-ARROW = 'ARROW'  # '->'
+ARROW = 'ARROW'	 # '->'
 
 # Augmented Assignment Operators
 PLUS_ASSIGN = 'PLUS_ASSIGN'  # '+<-'
 MINUS_ASSIGN = 'MINUS_ASSIGN'  # '-<-'
 MULTIPLY_ASSIGN = 'MULTIPLY_ASSIGN'  # '*<-'
-DIVIDE_ASSIGN = 'DIVIDE_ASSIGN'  # '/<-'
+DIVIDE_ASSIGN = 'DIVIDE_ASSIGN'	 # '/<-'
 EXPONENT_ASSIGN = 'EXPONENT_ASSIGN'  # '**<-'
 FLOOR_DIVIDE_ASSIGN = 'FLOOR_DIVIDE_ASSIGN'  # '//<-'
 
 # Boolean Literals and Logical Operators
 KEYWORD_TRUE = 'KEYWORD_TRUE'  # 'true'
-KEYWORD_FALSE = 'KEYWORD_FALSE'  # 'false'
+KEYWORD_FALSE = 'KEYWORD_FALSE'	 # 'false'
 KEYWORD_AND = 'KEYWORD_AND'  # 'and'
 KEYWORD_OR = 'KEYWORD_OR'  # 'or'
 KEYWORD_NOT = 'KEYWORD_NOT'  # 'not'
-KEYWORD_WHILE = 'KEYWORD_WHILE'  # 'while'
-KEYWORD_C = 'KEYWORD_C'  # 'c' for curried functions
+KEYWORD_WHILE = 'KEYWORD_WHILE'	 # 'while'
+KEYWORD_C = 'KEYWORD_C'	 # 'c' for curried functions
 
 # Comparison Operators
 EQ = 'EQ'  # '=='
@@ -51,12 +51,12 @@ LTE = 'LTE'  # '<='
 GTE = 'GTE'  # '>='
 
 # Punctuation
-COMMA = 'COMMA'  # ','
+COMMA = 'COMMA'	 # ','
 LPAREN = 'LPAREN'  # '('
 RPAREN = 'RPAREN'  # ')'
 LBRACE = 'LBRACE'  # '{'
 RBRACE = 'RBRACE'  # '}'
-SEMICOLON = 'SEMICOLON'  # ';'
+SEMICOLON = 'SEMICOLON'	 # ';'
 
 # List Punctuation
 LBRACKET = 'LBRACKET'  # '['
@@ -85,7 +85,7 @@ class Lexer:
 	def __init__(self, text):
 		self.text = text
 		self.pos = 0  # Current position in the input text
-		self.current_char = self.text[self.pos] if self.text else None  # Current character
+		self.current_char = self.text[self.pos] if self.text else None	# Current character
 	
 	def advance(self):
 		"""Move to the next character in the input text."""
@@ -119,12 +119,12 @@ class Lexer:
 		"""Parse a string literal from the input (enclosed in double or single quotes).
 		Handles escape sequences: \n, \t, \\
 		"""
-		quote_char = self.current_char  # Capture the opening quote character
-		self.advance()  # Consume the opening quote
+		quote_char = self.current_char	# Capture the opening quote character
+		self.advance()	# Consume the opening quote
 		result = ''
 		while self.current_char is not None and self.current_char != quote_char:
 			if self.current_char == '\\':  # Handle escape sequences
-				self.advance()  # Consume the backslash
+				self.advance()	# Consume the backslash
 				if self.current_char == 'n':
 					result += '\n'
 				elif self.current_char == 't':
@@ -139,7 +139,7 @@ class Lexer:
 			self.advance()
 		if self.current_char is None:
 			raise Exception(f'Lexer error: Unclosed string literal starting with {quote_char} at position {self.pos}')
-		self.advance()  # Consume the closing quote
+		self.advance()	# Consume the closing quote
 		return result
 	
 	def _id(self):
@@ -174,7 +174,7 @@ class Lexer:
 	def get_next_token(self):
 		"""Get the next token from the input text."""
 		while self.current_char is not None:
-			self.skip_whitespace()  # Always skip whitespace before processing
+			self.skip_whitespace()	# Always skip whitespace before processing
 			
 			if self.current_char is None:  # Check again after skipping whitespace
 				break
@@ -191,36 +191,36 @@ class Lexer:
 			# Handle multi-character operators and augmented assignments (longest match first)
 			if self.current_char == '*':
 				if self.peek() == '*':
-					self.advance()  # Consume first '*'
+					self.advance()	# Consume first '*'
 					if self.peek() == '<' and self.peek(2) == '-':
-						self.advance()  # Consume second '*'
-						self.advance()  # Consume '<'
-						self.advance()  # Consume '-'
+						self.advance()	# Consume second '*'
+						self.advance()	# Consume '<'
+						self.advance()	# Consume '-'
 						return Token(EXPONENT_ASSIGN, '**<-')
-					self.advance()  # Consume second '*'
+					self.advance()	# Consume second '*'
 					return Token(EXPONENT, '**')
 				elif self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '*'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '*'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(MULTIPLY_ASSIGN, '*<-')
 				self.advance()
 				return Token(MULTIPLY, '*')
 			
 			if self.current_char == '/':
 				if self.peek() == '/':
-					self.advance()  # Consume first '/'
+					self.advance()	# Consume first '/'
 					if self.peek() == '<' and self.peek(2) == '-':
-						self.advance()  # Consume second '/'
-						self.advance()  # Consume '<'
-						self.advance()  # Consume '-'
+						self.advance()	# Consume second '/'
+						self.advance()	# Consume '<'
+						self.advance()	# Consume '-'
 						return Token(FLOOR_DIVIDE_ASSIGN, '//<-')
-					self.advance()  # Consume second '/'
+					self.advance()	# Consume second '/'
 					return Token(FLOOR_DIVIDE, '//')
 				elif self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '/'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '/'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(DIVIDE_ASSIGN, '/<-')
 				self.advance()
 				return Token(DIVIDE, '/')
@@ -258,22 +258,22 @@ class Lexer:
 			
 			if self.current_char == '-':
 				if self.peek() == '>':
-					self.advance()  # Consume '-'
-					self.advance()  # Consume '>'
+					self.advance()	# Consume '-'
+					self.advance()	# Consume '>'
 					return Token(ARROW, '->')
 				elif self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '-'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '-'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(MINUS_ASSIGN, '-<-')
 				self.advance()
 				return Token(MINUS, '-')
 			
 			if self.current_char == '+':
 				if self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '+'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '+'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(PLUS_ASSIGN, '+<-')
 				self.advance()
 				return Token(PLUS, '+')
@@ -313,7 +313,7 @@ class Lexer:
 			
 			# If none of the above, it's an unexpected character
 			raise Exception(f'Lexer error: Invalid character "{self.current_char}" at position {self.pos}')
-		return Token(EOF, None)  # Return EOF when all input is processed
+		return Token(EOF, None)	 # Return EOF when all input is processed
 
 
 # --- AST (Abstract Syntax Tree) Nodes ---
@@ -417,14 +417,15 @@ class InputStatement(AST):
 
 class OutputStatement(AST):
 	def __init__(self, expressions):  # Now takes a list of expressions
-		self.expressions = expressions  # List of expressions to be printed
+		self.expressions = expressions	# List of expressions to be printed
 
 
 class ForStatement(AST):
-	def __init__(self, variable, start_expr, end_expr, body):
+	def __init__(self, variable, start_expr, end_expr, step_expr, body):
 		self.variable = variable  # The loop variable (Var node)
 		self.start_expr = start_expr  # Expression for the start of the range
 		self.end_expr = end_expr  # Expression for the end of the range
+		self.step_expr = step_expr  # Expression for the step value (may be None)
 		self.body = body  # List of statements in the loop body
 
 
@@ -435,7 +436,7 @@ class WhileStatement(AST):
 		self.body = body  # List of statements in the loop body
 
 
-class ExpressionStatement(AST):  # New AST node for expressions treated as statements
+class ExpressionStatement(AST):	 # New AST node for expressions treated as statements
 	def __init__(self, expression):
 		self.expression = expression
 
@@ -551,7 +552,7 @@ class Parser:
 			lexer_current_char_backup = self.lexer.current_char
 			parser_current_token_backup = self.current_token
 			try:
-				self.variable()  # Consume first IDENTIFIER
+				self.variable()	 # Consume first IDENTIFIER
 				while self.current_token.type == COMMA:
 					self.eat(COMMA)
 					self.variable()
@@ -573,7 +574,7 @@ class Parser:
 			lexer_current_char_backup = self.lexer.current_char
 			parser_current_token_backup = self.current_token
 			try:
-				self.variable()  # Consume IDENTIFIER
+				self.variable()	 # Consume IDENTIFIER
 				if self.current_token.type == ASSIGN:
 					self.lexer.pos = lexer_pos_backup
 					self.lexer.current_char = lexer_current_char_backup
@@ -660,23 +661,27 @@ class Parser:
 		"""
 		var_node = self.variable()
 		op_token = self.current_token
-		self.eat(op_token.type)  # Consume the augmented assignment operator
+		self.eat(op_token.type)	 # Consume the augmented assignment operator
 		expr_node = self.expression()
 		return AugmentedAssign(var_node, op_token, expr_node)
 	
 	def for_statement(self):
 		"""
 		Parses a for loop statement.
-		for_statement ::= LPAREN IDENTIFIER KEYWORD_FOR expression RANGE_OP expression RPAREN ARROW LBRACE (statement (SEMICOLON statement)*)* RBRACE
+		for_statement ::= LPAREN IDENTIFIER KEYWORD_FOR expression RANGE_OP expression (RANGE_OP expression)? RPAREN ARROW LBRACE (statement (SEMICOLON statement)*)* RBRACE
 		"""
 		self.eat(LPAREN)  # Consume '('
 		loop_var = self.variable()  # Get the loop variable (e.g., 'x')
 		self.eat(KEYWORD_FOR)  # Consume 'for'
-		start_expr = self.expression()  # Get the start expression (e.g., '1')
+		start_expr = self.expression()	# Get the start expression (e.g., '1')
 		self.eat(RANGE_OP)  # Consume '..'
 		end_expr = self.expression()  # Get the end expression (e.g., '5')
+		step_expr = None
+		if self.current_token.type == RANGE_OP:
+			self.eat(RANGE_OP)
+			step_expr = self.expression()
 		self.eat(RPAREN)  # Consume ')'
-		self.eat(ARROW)  # Consume '->'
+		self.eat(ARROW)	 # Consume '->'
 		self.eat(LBRACE)  # Consume '{'
 		
 		body_statements = []
@@ -689,7 +694,7 @@ class Parser:
 				if self.current_token.type != RBRACE and self.current_token.type != EOF:
 					body_statements.append(self.statement())
 		self.eat(RBRACE)  # Consume '}'
-		return ForStatement(loop_var, start_expr, end_expr, body_statements)
+		return ForStatement(loop_var, start_expr, end_expr, body_statements, step_expr)
 	
 	def while_statement(self):
 		"""
@@ -698,10 +703,10 @@ class Parser:
 		"""
 		self.eat(LPAREN)  # Consume '('
 		loop_var = self.variable()  # Consume the loop variable (e.g., 'x')
-		self.eat(KEYWORD_WHILE)  # Consume 'while'
+		self.eat(KEYWORD_WHILE)	 # Consume 'while'
 		condition = self.expression()  # Get the condition expression (e.g., 'x < 5')
 		self.eat(RPAREN)  # Consume ')'
-		self.eat(ARROW)  # Consume '->'
+		self.eat(ARROW)	 # Consume '->'
 		self.eat(LBRACE)  # Consume '{'
 		
 		body_statements = []
@@ -714,7 +719,7 @@ class Parser:
 		self.eat(RBRACE)  # Consume '}'
 		return WhileStatement(loop_var, condition, body_statements)
 	
-	def expression_statement(self):  # New: Parses an expression as a statement
+	def expression_statement(self):	 # New: Parses an expression as a statement
 		"""Parses an expression as a statement."""
 		node = self.expression()
 		return ExpressionStatement(node)
@@ -801,12 +806,12 @@ class Parser:
 		"""
 		node = self.primary()  # Start with a primary (variable, literal, lambda, etc.)
 		while self.current_token.type in (LBRACKET, LPAREN):
-			if self.current_token.type == LBRACKET:  # It's an index access
+			if self.current_token.type == LBRACKET:	 # It's an index access
 				self.eat(LBRACKET)
 				index_expr = self.expression()
 				self.eat(RBRACKET)
 				node = IndexAccess(node, index_expr)
-			elif self.current_token.type == LPAREN:  # It's a function call
+			elif self.current_token.type == LPAREN:	 # It's a function call
 				self.eat(LPAREN)
 				args = []
 				if self.current_token.type != RPAREN:  # Check if there are arguments
@@ -815,7 +820,7 @@ class Parser:
 						self.eat(COMMA)
 						args.append(self.expression())
 				self.eat(RPAREN)
-				node = Call(node, args)  # The node here is the function being called (e.g., Var('square'))
+				node = Call(node, args)	 # The node here is the function being called (e.g., Var('square'))
 		return node
 	
 	def primary(self):
@@ -939,7 +944,7 @@ class Parser:
 					if self.current_token.type != RBRACE and self.current_token.type != EOF:
 						body_statements.append(self.statement())
 			self.eat(RBRACE)
-			body = Program(body_statements)  # Body is a Program node
+			body = Program(body_statements)	 # Body is a Program node
 		else:
 			body = self.expression()  # Body is a single expression
 		
@@ -958,7 +963,7 @@ class Callable:
 	def __init__(self, params, body, closure_env, is_curried=False, applied_args=None):
 		self.params = params
 		self.body = body
-		self.closure_env = closure_env  # The scope where the lambda was defined
+		self.closure_env = closure_env	# The scope where the lambda was defined
 		self.is_curried = is_curried
 		self.applied_args = applied_args if applied_args is not None else []
 	
@@ -1165,7 +1170,7 @@ class Interpreter:
 		"""
 		# A copy of the current scope stack is taken to form the closure environment.
 		# This allows the lambda to access variables from where it was defined.
-		closure_env = list(self.scopes)  # Create a copy of the scope stack
+		closure_env = list(self.scopes)	 # Create a copy of the scope stack
 		return Callable(node.params, node.body, closure_env, is_curried=node.is_curried)
 	
 	def visit_Call(self, node):
@@ -1183,7 +1188,7 @@ class Interpreter:
 		if func_obj.is_curried and len(combined_args) < len(func_obj.params):
 			# Return a new partially applied callable
 			return Callable(func_obj.params, func_obj.body, func_obj.closure_env,
-			                is_curried=True, applied_args=combined_args)
+					is_curried=True, applied_args=combined_args)
 		
 		if len(combined_args) != len(func_obj.params):
 			raise Exception(
@@ -1202,11 +1207,11 @@ class Interpreter:
 		
 		result = None
 		try:
-			if isinstance(func_obj.body, Program):  # If body is a block of statements
+			if isinstance(func_obj.body, Program):	# If body is a block of statements
 				# Execute each statement in the block
 				# The result of the last expression in the block is the return value
 				for statement in func_obj.body.statements:
-					result = self.visit(statement)  # Update result with each statement's return
+					result = self.visit(statement)	# Update result with each statement's return
 			else:  # Body is a single expression
 				result = self.visit(func_obj.body)
 		finally:
@@ -1254,7 +1259,7 @@ class Interpreter:
 		else:
 			raise Exception(f"Runtime error: Unknown augmented assignment operator {node.op.value}")
 		
-		self.assign_variable(var_name, new_val)  # Use assign_variable
+		self.assign_variable(var_name, new_val)	 # Use assign_variable
 	
 	def visit_InputStatement(self, node):
 		"""
@@ -1296,15 +1301,20 @@ class Interpreter:
 		loop_var_name = node.variable.value
 		start_val = self.visit(node.start_expr)
 		end_val = self.visit(node.end_expr)
-		
-		if not isinstance(start_val, int) or not isinstance(end_val, int):
+		step_val = self.visit(node.step_expr) if node.step_expr is not None else 1
+
+		if not isinstance(start_val, int) or not isinstance(end_val, int) or not isinstance(step_val, int):
 			raise Exception("Runtime error: For loop range must be integers.")
-		
+
+		if step_val == 0:
+			raise Exception("Runtime error: For loop step cannot be 0.")
+
 		# Enter a new scope for the loop body
 		self.enter_scope()
-		
+
 		try:
-			for i in range(start_val, end_val + 1):
+			stop_val = end_val + (1 if step_val > 0 else -1)
+			for i in range(start_val, stop_val, step_val):
 				self.current_scope[loop_var_name] = i  # Loop var specific to this scope
 				for statement in node.body:
 					self.visit(statement)
@@ -1353,25 +1363,25 @@ if __name__ == '__main__':
 	print("--- Mini Language REPL ---")
 	print("Type 'quit' to exit.")
 	print("Examples:")
-	print("  a <- 10; b <- 5; out <- a + b")
-	print("  a +<- 2; out <- a")
-	print("  out <- 'Hello' <- ' ' <- 'World!'")
-	print("  out <- 'abc' * 3")
-	print("  out <- 'Line 1\\nLine 2\\tTabbed' <- '\\n'")
-	print("  out <- true and false; out <- '\\n'")
-	print("  out <- not true; out <- '\\n'")
-	print("  (x for 1..3) -> { out <- x out <- ' ' }")
-	print("  x <- 0; (x while x < 5) -> { out <- x; x +<- 1; out <- '\\n' }")
-	print("  my_list <- [10, 'hello', true]; out <- my_list[1]; out <- '\\n'")
-	print("  my_list[0] <- 99; out <- my_list[0]; out <- '\\n'")
-	print("  my_list <- 50; out <- my_list; out <- '\\n'")  # Dynamic typing example
-	print("  square <- (x) <- x * x; out <- square(4); out <- '\\n'")
-	print("  add <- (a, b) <- a + b; out <- add(10, 20); out <- '\\n'")
-	print("  closure_example <- (y) <- (x) <- x + y; f <- closure_example(10); out <- f(5); out <- '\\n'")
-	print("  # New: Lambda with block body (implicit return)")
-	print("  adder_block <- (x) <- { y <- x + 1; y }; out <- adder_block(4); out <- '\\n'")
-	print("  # New: Currying example")
-	print("  curried_sum <- c(a, b) <- a + b; add_five <- curried_sum(5); out <- add_five(3); out <- '\\n'")
+	print("	 a <- 10; b <- 5; out <- a + b")
+	print("	 a +<- 2; out <- a")
+	print("	 out <- 'Hello' <- ' ' <- 'World!'")
+	print("	 out <- 'abc' * 3")
+	print("	 out <- 'Line 1\\nLine 2\\tTabbed' <- '\\n'")
+	print("	 out <- true and false; out <- '\\n'")
+	print("	 out <- not true; out <- '\\n'")
+	print("	 (x for 1..3) -> { out <- x out <- ' ' }")
+	print("	 x <- 0; (x while x < 5) -> { out <- x; x +<- 1; out <- '\\n' }")
+	print("	 my_list <- [10, 'hello', true]; out <- my_list[1]; out <- '\\n'")
+	print("	 my_list[0] <- 99; out <- my_list[0]; out <- '\\n'")
+	print("	 my_list <- 50; out <- my_list; out <- '\\n'")	# Dynamic typing example
+	print("	 square <- (x) <- x * x; out <- square(4); out <- '\\n'")
+	print("	 add <- (a, b) <- a + b; out <- add(10, 20); out <- '\\n'")
+	print("	 closure_example <- (y) <- (x) <- x + y; f <- closure_example(10); out <- f(5); out <- '\\n'")
+	print("	 # New: Lambda with block body (implicit return)")
+	print("	 adder_block <- (x) <- { y <- x + 1; y }; out <- adder_block(4); out <- '\\n'")
+	print("	 # New: Currying example")
+	print("	 curried_sum <- c(a, b) <- a + b; add_five <- curried_sum(5); out <- add_five(3); out <- '\\n'")
 	print("-" * 30)
 	
 	interpreter = Interpreter()  # Initialize interpreter without a parser initially
