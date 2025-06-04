@@ -81,38 +81,30 @@ class Lexer:
 		return result
 	
 	def _id(self):
-		"""Parse an identifier or a keyword."""
+		"""Parse an identifier or keyword."""
 		result = ''
 		while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
 			result += self.current_char
 			self.advance()
-		# Check if the identifier is a reserved keyword
-		if result == 'int':
-			return Token(KEYWORD_INT, 'int')
-		elif result == 'out':
-			return Token(KEYWORD_OUT, 'out')
-		elif result == 'for':
-			return Token(KEYWORD_FOR, 'for')
-		elif result == 'true':
-			return Token(KEYWORD_TRUE, True)
-		elif result == 'false':
-			return Token(KEYWORD_FALSE, False)
-		elif result == 'and':
-			return Token(KEYWORD_AND, 'and')
-		elif result == 'or':
-			return Token(KEYWORD_OR, 'or')
-		elif result == 'not':
-			return Token(KEYWORD_NOT, 'not')
-		elif result == 'while':
-			return Token(KEYWORD_WHILE, 'while')
-		elif result == 'if':
-			return Token(KEYWORD_IF, 'if')
-		elif result == 'else':
-			return Token(KEYWORD_ELSE, 'else')
-		elif result == 'c':
-			return Token(KEYWORD_C, 'c')
+		keywords = {
+		'int': (KEYWORD_INT, 'int'),
+		'out': (KEYWORD_OUT, 'out'),
+		'for': (KEYWORD_FOR, 'for'),
+		'true': (KEYWORD_TRUE, True),
+		'false': (KEYWORD_FALSE, False),
+		'and': (KEYWORD_AND, 'and'),
+		'or': (KEYWORD_OR, 'or'),
+		'not': (KEYWORD_NOT, 'not'),
+		'while': (KEYWORD_WHILE, 'while'),
+		'if': (KEYWORD_IF, 'if'),
+		'else': (KEYWORD_ELSE, 'else'),
+		'c': (KEYWORD_C, 'c'),
+		}
+		type_val = keywords.get(result)
+		if type_val:
+			return Token(*type_val)
 		return Token(IDENTIFIER, result)
-	
+		
 	def get_next_token(self):
 		"""Get the next token from the input text."""
 		while self.current_char is not None:
