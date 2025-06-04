@@ -87,24 +87,24 @@ class Lexer:
 			result += self.current_char
 			self.advance()
 		keywords = {
-		'int': (KEYWORD_INT, 'int'),
-		'out': (KEYWORD_OUT, 'out'),
-		'for': (KEYWORD_FOR, 'for'),
-		'true': (KEYWORD_TRUE, True),
-		'false': (KEYWORD_FALSE, False),
-		'and': (KEYWORD_AND, 'and'),
-		'or': (KEYWORD_OR, 'or'),
-		'not': (KEYWORD_NOT, 'not'),
-		'while': (KEYWORD_WHILE, 'while'),
-		'if': (KEYWORD_IF, 'if'),
-		'else': (KEYWORD_ELSE, 'else'),
-		'c': (KEYWORD_C, 'c'),
+			'int': (KEYWORD_INT, 'int'),
+			'out': (KEYWORD_OUT, 'out'),
+			'for': (KEYWORD_FOR, 'for'),
+			'true': (KEYWORD_TRUE, True),
+			'false': (KEYWORD_FALSE, False),
+			'and': (KEYWORD_AND, 'and'),
+			'or': (KEYWORD_OR, 'or'),
+			'not': (KEYWORD_NOT, 'not'),
+			'while': (KEYWORD_WHILE, 'while'),
+			'if': (KEYWORD_IF, 'if'),
+			'else': (KEYWORD_ELSE, 'else'),
+			'c': (KEYWORD_C, 'c'),
 		}
 		type_val = keywords.get(result)
 		if type_val:
 			return Token(*type_val)
 		return Token(IDENTIFIER, result)
-		
+	
 	def get_next_token(self):
 		"""Get the next token from the input text."""
 		while self.current_char is not None:

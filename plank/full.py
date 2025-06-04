@@ -580,7 +580,8 @@ class Parser:
 					self.current_token = parser_current_token_backup
 					return self.assignment_statement()
 				elif self.current_token.type in (
-				PLUS_ASSIGN, MINUS_ASSIGN, MULTIPLY_ASSIGN, DIVIDE_ASSIGN, EXPONENT_ASSIGN, FLOOR_DIVIDE_ASSIGN):
+						PLUS_ASSIGN, MINUS_ASSIGN, MULTIPLY_ASSIGN, DIVIDE_ASSIGN, EXPONENT_ASSIGN,
+						FLOOR_DIVIDE_ASSIGN):
 					self.lexer.pos = lexer_pos_backup
 					self.lexer.current_char = lexer_current_char_backup
 					self.current_token = parser_current_token_backup
