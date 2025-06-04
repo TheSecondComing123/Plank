@@ -38,6 +38,8 @@ KEYWORD_AND = 'KEYWORD_AND'  # 'and'
 KEYWORD_OR = 'KEYWORD_OR'  # 'or'
 KEYWORD_NOT = 'KEYWORD_NOT'  # 'not'
 KEYWORD_WHILE = 'KEYWORD_WHILE'  # 'while'
+KEYWORD_IF = 'KEYWORD_IF'  # 'if'
+KEYWORD_ELSE = 'KEYWORD_ELSE'  # 'else'
 KEYWORD_C = 'KEYWORD_C'  # 'c' for curried functions
 
 # Comparison Operators
