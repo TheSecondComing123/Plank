@@ -277,7 +277,10 @@ class Interpreter:
 	def visit_AugmentedAssign(self, node):
 		"""Perform augmented assignment (e.g., a +<- 3)."""
 		var_name = node.left.value
-		current_val = self.lookup_variable(var_name)  # Use lookup_variable
+		try:
+			current_val = self.lookup_variable(var_name)  # Use lookup_variable
+		except Exception:
+			current_val = 0
 		expr_val = self.visit(node.right)
 		
 		# Perform the operation based on the augmented assignment type
