@@ -208,7 +208,9 @@ class Interpreter:
 			list_obj[index_val] = value_to_assign
 		except IndexError:
 			raise Exception(
-				f"Runtime error: List index {index_val} out of bounds for list of size {len(list_obj)} during assignment.")
+				f"Runtime error: List index {index_val} out of bounds for "
+				f"list of size {len(list_obj)} during assignment."
+			)
 	
 	def visit_Lambda(self, node):
 		"""
