@@ -23,7 +23,8 @@ class TestPlankExamples(unittest.TestCase):
 			("out <- 'Line 1\\nLine 2\\tTabbed' <- '\\n'", "Line 1\nLine 2\tTabbed\n"),
 			("out <- true and false; out <- '\\n'", False),
 			("out <- not true; out <- '\\n'", False),
-			("(x for 1..3) -> { out <- x out <- ' ' }", None),  # may just print
+			# may just print
+			("(x for 1..3) -> { out <- x out <- ' ' }", None),
 			("x <- 0; (x while x < 5) -> { out <- x; x +<- 1; out <- '\\n' }", None),
 			("my_list <- [10, 'hello', true]; out <- my_list[1]; out <- '\\n'", 'hello'),
 			("my_list[0] <- 99; out <- my_list[0]; out <- '\\n'", 99),
