@@ -130,6 +130,7 @@ class ForStatement(AST):
 	start_expr: AST
 	end_expr: AST
 	body: list
+	step_expr: AST | None = None
 
 
 @dataclass(slots=True)

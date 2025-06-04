@@ -231,7 +231,7 @@ class Parser:
 	def for_statement(self):
 		"""
 		Parses a for loop statement.
-		for_statement ::= LPAREN IDENTIFIER KEYWORD_FOR expression RANGE_OP expression RPAREN ARROW LBRACE (statement (SEMICOLON statement)*)* RBRACE
+		for_statement ::= LPAREN IDENTIFIER KEYWORD_FOR expression RANGE_OP expression (RANGE_OP expression)? RPAREN ARROW LBRACE (statement (SEMICOLON statement)*)* RBRACE
 		"""
 		self.eat(LPAREN)  # Consume '('
 		loop_var = self.variable()  # Get the loop variable (e.g., 'x')
@@ -239,6 +239,10 @@ class Parser:
 		start_expr = self.expression()  # Get the start expression (e.g., '1')
 		self.eat(RANGE_OP)  # Consume '..'
 		end_expr = self.expression()  # Get the end expression (e.g., '5')
+		step_expr = None
+		if self.current_token.type == RANGE_OP:
+			self.eat(RANGE_OP)
+			step_expr = self.expression()
 		self.eat(RPAREN)  # Consume ')'
 		self.eat(ARROW)  # Consume '->'
 		self.eat(LBRACE)  # Consume '{'
@@ -253,7 +257,7 @@ class Parser:
 				if self.current_token.type != RBRACE and self.current_token.type != EOF:
 					body_statements.append(self.statement())
 		self.eat(RBRACE)  # Consume '}'
-		return ForStatement(loop_var, start_expr, end_expr, body_statements)
+		return ForStatement(loop_var, start_expr, end_expr, body_statements, step_expr)
 	
 	def while_statement(self):
 		"""
@@ -352,10 +356,10 @@ class Parser:
 			token = self.current_token
 			self.eat(KEYWORD_NOT)
 			return UnaryOp(op=token, right=self.call_or_index_expression())
-		# elif self.current_token.type == MINUS: # Uncomment for unary minus
-		#     token = self.current_token
-		#     self.eat(MINUS)
-		#     return UnaryOp(op=token, right=self.call_or_index_expression())
+		elif self.current_token.type == MINUS:
+			token = self.current_token
+			self.eat(MINUS)
+			return UnaryOp(op=token, right=self.call_or_index_expression())
 		return self.call_or_index_expression()
 	
 	def call_or_index_expression(self):  # Handles both indexing and function calls as postfix
