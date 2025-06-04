@@ -1,129 +1,150 @@
 # --- AST (Abstract Syntax Tree) Nodes ---
 # Classes representing different nodes in our program's syntax tree.
+from dataclasses import dataclass
+from plank.lexer import Token
+
+
 class AST:
-	pass
+        """Base class for all AST nodes."""
+        pass
 
 
+@dataclass(slots=True)
 class Program(AST):
-	def __init__(self, statements):
-		self.statements = statements  # A list of statement nodes
+        statements: list  # List of statement nodes
 
 
+@dataclass(slots=True)
 class BinOp(AST):
-	def __init__(self, left, op, right):
-		self.left = left  # Left-hand side expression
-		self.op = op  # Operator token (+, -, *, etc.)
-		self.right = right  # Right-hand side expression
+        left: AST
+        op: Token
+        right: AST
 
 
+@dataclass(slots=True)
 class UnaryOp(AST):
-	def __init__(self, op, right):
-		self.op = op  # Operator token (e.g., 'not')
-		self.right = right  # Operand
+        op: Token
+        right: AST
 
 
+@dataclass(slots=True)
 class Num(AST):
-	def __init__(self, token):
-		self.token = token
-		self.value = token.value  # The integer value
+        token: Token
+        value: int | None = None
+
+        def __post_init__(self):
+                if self.value is None:
+                        self.value = self.token.value
 
 
+@dataclass(slots=True)
 class String(AST):
-	def __init__(self, token):
-		self.token = token
-		self.value = token.value  # The string value
+        token: Token
+        value: str | None = None
+
+        def __post_init__(self):
+                if self.value is None:
+                        self.value = self.token.value
 
 
+@dataclass(slots=True)
 class Boolean(AST):
-	def __init__(self, token):
-		self.token = token
-		self.value = token.value  # The boolean value (True/False)
+        token: Token
+        value: bool | None = None
+
+        def __post_init__(self):
+                if self.value is None:
+                        self.value = self.token.value
 
 
+@dataclass(slots=True)
 class Var(AST):
-	def __init__(self, token):
-		self.token = token
-		self.value = token.value  # The variable name (string)
+        token: Token
+        value: str | None = None
+
+        def __post_init__(self):
+                if self.value is None:
+                        self.value = self.token.value
 
 
+@dataclass(slots=True)
 class ListLiteral(AST):
-	def __init__(self, elements):
-		self.elements = elements  # A list of AST nodes (expressions)
+        elements: list
 
 
+@dataclass(slots=True)
 class IndexAccess(AST):
-	def __init__(self, list_expr, index_expr):
-		self.list_expr = list_expr  # The expression that evaluates to a list (e.g., a Var node)
-		self.index_expr = index_expr  # The expression that evaluates to the index
+        list_expr: AST
+        index_expr: AST
 
 
+@dataclass(slots=True)
 class ListAssign(AST):
-	def __init__(self, list_var, index_expr, value_expr):
-		self.list_var = list_var  # The Var node representing the list variable
-		self.index_expr = index_expr  # The expression for the index
-		self.value_expr = value_expr  # The expression for the value to assign
+        list_var: Var
+        index_expr: AST
+        value_expr: AST
 
 
+@dataclass(slots=True)
 class Lambda(AST):
-	def __init__(self, params, body, is_curried=False):
-		self.params = params  # List of Var nodes for parameters
-		self.body = body  # AST node for the lambda's body (expression or Program)
-		self.is_curried = is_curried  # Flag for curried function
+        params: list
+        body: AST
+        is_curried: bool = False
 
 
+@dataclass(slots=True)
 class Call(AST):
-	def __init__(self, func_expr, args):
-		self.func_expr = func_expr  # The expression evaluating to the callable
-		self.args = args  # List of AST nodes for arguments
+        func_expr: AST
+        args: list
 
 
+@dataclass(slots=True)
 class Assign(AST):
-	def __init__(self, left, op, right):
-		self.left = left  # The variable (Var node) being assigned to
-		self.op = op  # The ASSIGN token ('<-')
-		self.right = right  # The expression whose value is assigned
+        left: Var
+        op: Token
+        right: AST
 
 
+@dataclass(slots=True)
 class AugmentedAssign(AST):
-	def __init__(self, left, op, right):
-		self.left = left  # The variable (Var node) being assigned to
-		self.op = op  # The augmented assignment token (e.g., '+<-')
-		self.right = right  # The expression whose value is used in the operation
+        left: Var
+        op: Token
+        right: AST
 
 
+@dataclass(slots=True)
 class InputStatement(AST):
-	def __init__(self, variables, type_token):
-		self.variables = variables  # List of Var nodes to store input
-		self.type_token = type_token  # The KEYWORD_INT token
+        variables: list
+        type_token: Token
 
 
+@dataclass(slots=True)
 class OutputStatement(AST):
-	def __init__(self, expressions):  # Now takes a list of expressions
-		self.expressions = expressions  # List of expressions to be printed
+        expressions: list
 
 
+@dataclass(slots=True)
 class ForStatement(AST):
-	def __init__(self, variable, start_expr, end_expr, body):
-		self.variable = variable  # The loop variable (Var node)
-		self.start_expr = start_expr  # Expression for the start of the range
-		self.end_expr = end_expr  # Expression for the end of the range
-		self.body = body  # List of statements in the loop body
+        variable: Var
+        start_expr: AST
+        end_expr: AST
+        body: list
 
 
+@dataclass(slots=True)
 class WhileStatement(AST):
-        def __init__(self, loop_var, condition, body):
-                self.loop_var = loop_var  # The variable for the loop (e.g., 'x')
-                self.condition = condition  # The expression representing the loop condition (e.g., 'x < 5')
-                self.body = body  # List of statements in the loop body
+        loop_var: Var
+        condition: AST
+        body: list
 
 
+@dataclass(slots=True)
 class IfExpression(AST):
-	def __init__(self, condition, then_branch, else_branch=None):
-		self.condition = condition
-		self.then_branch = then_branch
-		self.else_branch = else_branch
+        condition: AST
+        then_branch: AST
+        else_branch: AST | None = None
 
 
-class ExpressionStatement(AST):  # New AST node for expressions treated as statements
-	def __init__(self, expression):
-		self.expression = expression
+@dataclass(slots=True)
+class ExpressionStatement(AST):  # Expression used as a statement
+        expression: AST

@@ -1,63 +1,74 @@
-# --- Token Types ---
-# Define constants for all token types our language will recognize.
-EOF = 'EOF'  # End of File
-IDENTIFIER = 'IDENTIFIER'  # Variable names (e.g., 'a', 'b', 'result')
-INTEGER = 'INTEGER'  # Integer literals (e.g., '10', '42')
-STRING = 'STRING'  # String literals (e.g., '"hello"', '" "')
+"""Enumeration of all token types used by the language."""
 
-# Arithmetic Operators
-PLUS = 'PLUS'  # '+'
-MINUS = 'MINUS'  # '-'
-MULTIPLY = 'MULTIPLY'  # '*'
-DIVIDE = 'DIVIDE'  # '/'
-EXPONENT = 'EXPONENT'  # '**'
-FLOOR_DIVIDE = 'FLOOR_DIVIDE'  # '//'
+from enum import StrEnum, auto
 
-# Assignment and Keywords
-ASSIGN = 'ASSIGN'  # '<-'
-KEYWORD_INT = 'KEYWORD_INT'  # 'int' (for input type)
-KEYWORD_OUT = 'KEYWORD_OUT'  # 'out' (for output statement)
 
-# For Loop Keywords and Operators
-KEYWORD_FOR = 'KEYWORD_FOR'  # 'for'
-RANGE_OP = 'RANGE_OP'  # '..'
-ARROW = 'ARROW'  # '->'
+class TokenType(StrEnum):
+    """Enumeration of all token types."""
 
-# Augmented Assignment Operators
-PLUS_ASSIGN = 'PLUS_ASSIGN'  # '+<-'
-MINUS_ASSIGN = 'MINUS_ASSIGN'  # '-<-'
-MULTIPLY_ASSIGN = 'MULTIPLY_ASSIGN'  # '*<-'
-DIVIDE_ASSIGN = 'DIVIDE_ASSIGN'  # '/<-'
-EXPONENT_ASSIGN = 'EXPONENT_ASSIGN'  # '**<-'
-FLOOR_DIVIDE_ASSIGN = 'FLOOR_DIVIDE_ASSIGN'  # '//<-'
+    EOF = auto()  # End of File
+    IDENTIFIER = auto()  # Variable names (e.g., 'a', 'b', 'result')
+    INTEGER = auto()  # Integer literals (e.g., '10', '42')
+    STRING = auto()  # String literals (e.g., '"hello"', '" "')
 
-# Boolean Literals and Logical Operators
-KEYWORD_TRUE = 'KEYWORD_TRUE'  # 'true'
-KEYWORD_FALSE = 'KEYWORD_FALSE'  # 'false'
-KEYWORD_AND = 'KEYWORD_AND'  # 'and'
-KEYWORD_OR = 'KEYWORD_OR'  # 'or'
-KEYWORD_NOT = 'KEYWORD_NOT'  # 'not'
-KEYWORD_WHILE = 'KEYWORD_WHILE'  # 'while'
-KEYWORD_IF = 'KEYWORD_IF'  # 'if'
-KEYWORD_ELSE = 'KEYWORD_ELSE'  # 'else'
-KEYWORD_C = 'KEYWORD_C'  # 'c' for curried functions
+    # Arithmetic Operators
+    PLUS = auto()  # '+'
+    MINUS = auto()  # '-'
+    MULTIPLY = auto()  # '*'
+    DIVIDE = auto()  # '/'
+    EXPONENT = auto()  # '**'
+    FLOOR_DIVIDE = auto()  # '//'
 
-# Comparison Operators
-EQ = 'EQ'  # '=='
-NEQ = 'NEQ'  # '!='
-LT = 'LT'  # '<'
-GT = 'GT'  # '>'
-LTE = 'LTE'  # '<='
-GTE = 'GTE'  # '>='
+    # Assignment and Keywords
+    ASSIGN = auto()  # '<-'
+    KEYWORD_INT = auto()  # 'int' (for input type)
+    KEYWORD_OUT = auto()  # 'out' (for output statement)
 
-# Punctuation
-COMMA = 'COMMA'  # ','
-LPAREN = 'LPAREN'  # '('
-RPAREN = 'RPAREN'  # ')'
-LBRACE = 'LBRACE'  # '{'
-RBRACE = 'RBRACE'  # '}'
-SEMICOLON = 'SEMICOLON'  # ';'
+    # For Loop Keywords and Operators
+    KEYWORD_FOR = auto()  # 'for'
+    RANGE_OP = auto()  # '..'
+    ARROW = auto()  # '->'
 
-# List Punctuation
-LBRACKET = 'LBRACKET'  # '['
-RBRACKET = 'RBRACKET'  # ']'
+    # Augmented Assignment Operators
+    PLUS_ASSIGN = auto()  # '+<-'
+    MINUS_ASSIGN = auto()  # '-<-'
+    MULTIPLY_ASSIGN = auto()  # '*<-'
+    DIVIDE_ASSIGN = auto()  # '/<-'
+    EXPONENT_ASSIGN = auto()  # '**<-'
+    FLOOR_DIVIDE_ASSIGN = auto()  # '//<-'
+
+    # Boolean Literals and Logical Operators
+    KEYWORD_TRUE = auto()  # 'true'
+    KEYWORD_FALSE = auto()  # 'false'
+    KEYWORD_AND = auto()  # 'and'
+    KEYWORD_OR = auto()  # 'or'
+    KEYWORD_NOT = auto()  # 'not'
+    KEYWORD_WHILE = auto()  # 'while'
+    KEYWORD_IF = auto()  # 'if'
+    KEYWORD_ELSE = auto()  # 'else'
+    KEYWORD_C = auto()  # 'c' for curried functions
+
+    # Comparison Operators
+    EQ = auto()  # '=='
+    NEQ = auto()  # '!='
+    LT = auto()  # '<'
+    GT = auto()  # '>'
+    LTE = auto()  # '<='
+    GTE = auto()  # '>='
+
+    # Punctuation
+    COMMA = auto()  # ','
+    LPAREN = auto()  # '('
+    RPAREN = auto()  # ')'
+    LBRACE = auto()  # '{'
+    RBRACE = auto()  # '}'
+    SEMICOLON = auto()  # ';'
+
+    # List Punctuation
+    LBRACKET = auto()  # '['
+    RBRACKET = auto()  # ']'
+
+
+# Export individual names for backwards compatibility
+globals().update(TokenType.__members__)
+__all__ = list(TokenType.__members__)
