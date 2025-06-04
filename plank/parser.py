@@ -387,6 +387,8 @@ class Parser:
 		primary ::= INTEGER | IDENTIFIER | STRING | BOOLEAN | ListLiteral | Lambda | LPAREN expression RPAREN
 		"""
 		token = self.current_token
+		if token.type == KEYWORD_IF:
+			return self.if_expression()
 		if token.type == INTEGER:
 			self.eat(INTEGER)
 			return Num(token)
@@ -507,6 +509,46 @@ class Parser:
 			body = self.expression()  # Body is a single expression
 		
 		return Lambda(params, body, is_curried)
+	def if_expression(self):
+		"""Parses an if expression with optional else/elif branches."""
+		self.eat(KEYWORD_IF)
+		condition = self.expression()
+		self.eat(ARROW)
+		if self.current_token.type == LBRACE:
+			self.eat(LBRACE)
+			body_statements = []
+			while self.current_token.type != RBRACE:
+				body_statements.append(self.statement())
+				while self.current_token.type == SEMICOLON:
+					self.eat(SEMICOLON)
+					if self.current_token.type != RBRACE and self.current_token.type != EOF:
+						body_statements.append(self.statement())
+			self.eat(RBRACE)
+			then_branch = Program(body_statements)
+		else:
+			then_branch = self.expression()
+
+		else_branch = None
+		if self.current_token.type == KEYWORD_ELSE:
+			self.eat(KEYWORD_ELSE)
+			if self.current_token.type == KEYWORD_IF:
+				else_branch = self.if_expression()
+			else:
+				if self.current_token.type == LBRACE:
+					self.eat(LBRACE)
+					body_statements = []
+					while self.current_token.type != RBRACE:
+						body_statements.append(self.statement())
+						while self.current_token.type == SEMICOLON:
+							self.eat(SEMICOLON)
+							if self.current_token.type != RBRACE and self.current_token.type != EOF:
+								body_statements.append(self.statement())
+					self.eat(RBRACE)
+					else_branch = Program(body_statements)
+				else:
+					else_branch = self.expression()
+
+		return IfExpression(condition, then_branch, else_branch)
 	
 	def variable(self):
 		"""Parses a variable (identifier)."""
