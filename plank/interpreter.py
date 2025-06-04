@@ -1,8 +1,8 @@
 import sys
 
+from plank.ast_nodes import *
 from plank.token_types import *
 from plank.token_types import TokenType
-from plank.ast_nodes import *
 
 
 # --- Interpreter ---
@@ -85,64 +85,64 @@ class Interpreter:
 		return last_result  # Return the result of the last statement/expression
 	
 	def visit_BinOp(self, node):
-	        """Evaluate binary operations and logical/comparison operators."""
-	        left_val = self.visit(node.left)
-	        right_val = self.visit(node.right)
-
-	        match node.op.type:
-	                case TokenType.PLUS:
-	                        if isinstance(left_val, str) and isinstance(right_val, str):
-	                                return left_val + right_val
-	                        if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
-	                                return left_val + right_val
-	                        raise Exception(
-	                                f"Runtime error: Cannot perform '+' on types {type(left_val).__name__} and {type(right_val).__name__}")
-
-	                case TokenType.MULTIPLY:
-	                        if isinstance(left_val, str) and isinstance(right_val, int):
-	                                return left_val * right_val
-	                        if isinstance(left_val, int) and isinstance(right_val, str):
-	                                return right_val * left_val
-	                        if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
-	                                return left_val * right_val
-	                        raise Exception(
-	                                f"Runtime error: Cannot perform '*' on types {type(left_val).__name__} and {type(right_val).__name__}")
-
-	                case TokenType.KEYWORD_AND:
-	                        return bool(left_val) and bool(right_val)
-	                case TokenType.KEYWORD_OR:
-	                        return bool(left_val) or bool(right_val)
-
-	                case TokenType.EQ:
-	                        return left_val == right_val
-	                case TokenType.NEQ:
-	                        return left_val != right_val
-	                case TokenType.LT:
-	                        return left_val < right_val
-	                case TokenType.GT:
-	                        return left_val > right_val
-	                case TokenType.LTE:
-	                        return left_val <= right_val
-	                case TokenType.GTE:
-	                        return left_val >= right_val
-
-	                case TokenType.MINUS:
-	                        if not isinstance(left_val, (int, float)) or not isinstance(right_val, (int, float)):
-	                                raise Exception(
-	                                        f"Runtime error: Cannot perform arithmetic operation '-' on non-numeric types.")
-	                        return left_val - right_val
-	                case TokenType.DIVIDE:
-	                        if right_val == 0:
-	                                raise Exception("Runtime error: Division by zero")
-	                        return left_val / right_val
-	                case TokenType.FLOOR_DIVIDE:
-	                        if right_val == 0:
-	                                raise Exception("Runtime error: Division by zero")
-	                        return left_val // right_val
-	                case TokenType.EXPONENT:
-	                        return left_val ** right_val
-	                case _:
-	                        raise Exception(f"Runtime error: Unknown binary operator {node.op.value}")
+		"""Evaluate binary operations and logical/comparison operators."""
+		left_val = self.visit(node.left)
+		right_val = self.visit(node.right)
+		
+		match node.op.type:
+			case TokenType.PLUS:
+				if isinstance(left_val, str) and isinstance(right_val, str):
+					return left_val + right_val
+				if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
+					return left_val + right_val
+				raise Exception(
+					f"Runtime error: Cannot perform '+' on types {type(left_val).__name__} and {type(right_val).__name__}")
+			
+			case TokenType.MULTIPLY:
+				if isinstance(left_val, str) and isinstance(right_val, int):
+					return left_val * right_val
+				if isinstance(left_val, int) and isinstance(right_val, str):
+					return right_val * left_val
+				if isinstance(left_val, (int, float)) and isinstance(right_val, (int, float)):
+					return left_val * right_val
+				raise Exception(
+					f"Runtime error: Cannot perform '*' on types {type(left_val).__name__} and {type(right_val).__name__}")
+			
+			case TokenType.KEYWORD_AND:
+				return bool(left_val) and bool(right_val)
+			case TokenType.KEYWORD_OR:
+				return bool(left_val) or bool(right_val)
+			
+			case TokenType.EQ:
+				return left_val == right_val
+			case TokenType.NEQ:
+				return left_val != right_val
+			case TokenType.LT:
+				return left_val < right_val
+			case TokenType.GT:
+				return left_val > right_val
+			case TokenType.LTE:
+				return left_val <= right_val
+			case TokenType.GTE:
+				return left_val >= right_val
+			
+			case TokenType.MINUS:
+				if not isinstance(left_val, (int, float)) or not isinstance(right_val, (int, float)):
+					raise Exception(
+						f"Runtime error: Cannot perform arithmetic operation '-' on non-numeric types.")
+				return left_val - right_val
+			case TokenType.DIVIDE:
+				if right_val == 0:
+					raise Exception("Runtime error: Division by zero")
+				return left_val / right_val
+			case TokenType.FLOOR_DIVIDE:
+				if right_val == 0:
+					raise Exception("Runtime error: Division by zero")
+				return left_val // right_val
+			case TokenType.EXPONENT:
+				return left_val ** right_val
+			case _:
+				raise Exception(f"Runtime error: Unknown binary operator {node.op.value}")
 	
 	def visit_UnaryOp(self, node):
 		"""Evaluate unary operations."""
@@ -398,7 +398,7 @@ class Interpreter:
 			return self.visit(node.else_branch)
 		else:
 			return None
-
+	
 	def visit_ExpressionStatement(self, node):  # New: Visit method for ExpressionStatement
 		"""Evaluates the expression within an ExpressionStatement."""
 		return self.visit(node.expression)

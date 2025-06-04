@@ -143,7 +143,8 @@ class Parser:
 					self.current_token = parser_current_token_backup
 					return self.assignment_statement()
 				elif self.current_token.type in (
-				PLUS_ASSIGN, MINUS_ASSIGN, MULTIPLY_ASSIGN, DIVIDE_ASSIGN, EXPONENT_ASSIGN, FLOOR_DIVIDE_ASSIGN):
+						PLUS_ASSIGN, MINUS_ASSIGN, MULTIPLY_ASSIGN, DIVIDE_ASSIGN, EXPONENT_ASSIGN,
+						FLOOR_DIVIDE_ASSIGN):
 					self.lexer.pos = lexer_pos_backup
 					self.lexer.current_char = lexer_current_char_backup
 					self.current_token = parser_current_token_backup
@@ -509,6 +510,7 @@ class Parser:
 			body = self.expression()  # Body is a single expression
 		
 		return Lambda(params, body, is_curried)
+	
 	def if_expression(self):
 		"""Parses an if expression with optional else/elif branches."""
 		self.eat(KEYWORD_IF)
@@ -527,7 +529,7 @@ class Parser:
 			then_branch = Program(body_statements)
 		else:
 			then_branch = self.expression()
-
+		
 		else_branch = None
 		if self.current_token.type == KEYWORD_ELSE:
 			self.eat(KEYWORD_ELSE)
@@ -547,7 +549,7 @@ class Parser:
 					else_branch = Program(body_statements)
 				else:
 					else_branch = self.expression()
-
+		
 		return IfExpression(condition, then_branch, else_branch)
 	
 	def variable(self):
