@@ -149,6 +149,10 @@ class Interpreter:
 		right_val = self.visit(node.right)
 		if node.op.type == KEYWORD_NOT:
 			return not bool(right_val)
+		elif node.op.type == MINUS:
+			if not isinstance(right_val, (int, float)):
+				raise Exception("Runtime error: Unary minus requires a numeric operand.")
+			return -right_val
 		else:
 			raise Exception(f"Runtime error: Unknown unary operator {node.op.value}")
 	
@@ -351,15 +355,17 @@ class Interpreter:
 		loop_var_name = node.variable.value
 		start_val = self.visit(node.start_expr)
 		end_val = self.visit(node.end_expr)
+		step_val = self.visit(node.step_expr) if node.step_expr is not None else (1 if start_val <= end_val else -1)
 		
-		if not isinstance(start_val, int) or not isinstance(end_val, int):
+		if not isinstance(start_val, int) or not isinstance(end_val, int) or not isinstance(step_val, int):
 			raise Exception("Runtime error: For loop range must be integers.")
 		
 		# Enter a new scope for the loop body
 		self.enter_scope()
 		
 		try:
-			for i in range(start_val, end_val + 1):
+			stop = end_val + (1 if step_val > 0 else -1)
+			for i in range(start_val, stop, step_val):
 				self.current_scope[loop_var_name] = i  # Loop var specific to this scope
 				for statement in node.body:
 					self.visit(statement)
