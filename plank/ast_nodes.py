@@ -111,10 +111,17 @@ class ForStatement(AST):
 
 
 class WhileStatement(AST):
-	def __init__(self, loop_var, condition, body):
-		self.loop_var = loop_var  # The variable for the loop (e.g., 'x')
-		self.condition = condition  # The expression representing the loop condition (e.g., 'x < 5')
-		self.body = body  # List of statements in the loop body
+        def __init__(self, loop_var, condition, body):
+                self.loop_var = loop_var  # The variable for the loop (e.g., 'x')
+                self.condition = condition  # The expression representing the loop condition (e.g., 'x < 5')
+                self.body = body  # List of statements in the loop body
+
+
+class IfExpression(AST):
+	def __init__(self, condition, then_branch, else_branch=None):
+		self.condition = condition
+		self.then_branch = then_branch
+		self.else_branch = else_branch
 
 
 class ExpressionStatement(AST):  # New AST node for expressions treated as statements

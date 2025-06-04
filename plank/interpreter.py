@@ -392,6 +392,15 @@ class Interpreter:
 			for statement in node.body:
 				self.visit(statement)
 	
+	def visit_IfExpression(self, node):
+		condition_val = self.visit(node.condition)
+		if condition_val:
+			return self.visit(node.then_branch)
+		elif node.else_branch is not None:
+			return self.visit(node.else_branch)
+		else:
+			return None
+
 	def visit_ExpressionStatement(self, node):  # New: Visit method for ExpressionStatement
 		"""Evaluates the expression within an ExpressionStatement."""
 		return self.visit(node.expression)
