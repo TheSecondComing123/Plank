@@ -39,8 +39,9 @@ class TestPlankExamples(unittest.TestCase):
 			("add <- (a, b) <- a + b; out <- add(10, 20); out <- '\\n'", 30),
 			("closure_example <- (y) <- (x) <- x + y; f <- closure_example(10); out <- f(5); out <- '\\n'", 15),
 			("adder_block <- (x) <- { y <- x + 1; y }; out <- adder_block(4); out <- '\\n'", 5),
-			("curried_sum <- c(a, b) <- a + b; add_five <- curried_sum(5); out <- add_five(3); out <- '\\n'", 8),
-		]
+                        ("curried_sum <- c(a, b) <- a + b; add_five <- curried_sum(5); out <- add_five(3); out <- '\\n'", 8),
+                        ("x <- 5; result <- if x < 0 -> { 'negative' } else if x == 0 -> { 'zero' } else { 'positive' }; out <- result", 'positive'),
+                ]
 		
 		for code, expected in cases:
 			with self.subTest(code=code):

@@ -105,6 +105,10 @@ class Lexer:
 			return Token(KEYWORD_NOT, 'not')
 		elif result == 'while':
 			return Token(KEYWORD_WHILE, 'while')
+		elif result == 'if':
+			return Token(KEYWORD_IF, 'if')
+		elif result == 'else':
+			return Token(KEYWORD_ELSE, 'else')
 		elif result == 'c':
 			return Token(KEYWORD_C, 'c')
 		return Token(IDENTIFIER, result)
