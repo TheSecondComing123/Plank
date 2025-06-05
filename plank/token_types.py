@@ -73,53 +73,7 @@ class TokenType(Enum):
 
 
 # Export individual names for backwards compatibility
-EOF = TokenType.EOF
-IDENTIFIER = TokenType.IDENTIFIER
-INTEGER = TokenType.INTEGER
-STRING = TokenType.STRING
-PLUS = TokenType.PLUS
-MINUS = TokenType.MINUS
-MULTIPLY = TokenType.MULTIPLY
-DIVIDE = TokenType.DIVIDE
-EXPONENT = TokenType.EXPONENT
-FLOOR_DIVIDE = TokenType.FLOOR_DIVIDE
-ASSIGN = TokenType.ASSIGN
-KEYWORD_INT = TokenType.KEYWORD_INT
-KEYWORD_STRING = TokenType.KEYWORD_STRING
-KEYWORD_BOOL = TokenType.KEYWORD_BOOL
-KEYWORD_LIST = TokenType.KEYWORD_LIST
-KEYWORD_OUT = TokenType.KEYWORD_OUT
-KEYWORD_FOR = TokenType.KEYWORD_FOR
-RANGE_OP = TokenType.RANGE_OP
-ARROW = TokenType.ARROW
-PLUS_ASSIGN = TokenType.PLUS_ASSIGN
-MINUS_ASSIGN = TokenType.MINUS_ASSIGN
-MULTIPLY_ASSIGN = TokenType.MULTIPLY_ASSIGN
-DIVIDE_ASSIGN = TokenType.DIVIDE_ASSIGN
-EXPONENT_ASSIGN = TokenType.EXPONENT_ASSIGN
-FLOOR_DIVIDE_ASSIGN = TokenType.FLOOR_DIVIDE_ASSIGN
-KEYWORD_TRUE = TokenType.KEYWORD_TRUE
-KEYWORD_FALSE = TokenType.KEYWORD_FALSE
-KEYWORD_AND = TokenType.KEYWORD_AND
-KEYWORD_OR = TokenType.KEYWORD_OR
-KEYWORD_NOT = TokenType.KEYWORD_NOT
-KEYWORD_WHILE = TokenType.KEYWORD_WHILE
-KEYWORD_IF = TokenType.KEYWORD_IF
-KEYWORD_ELSE = TokenType.KEYWORD_ELSE
-KEYWORD_C = TokenType.KEYWORD_C
-EQ = TokenType.EQ
-NEQ = TokenType.NEQ
-LT = TokenType.LT
-GT = TokenType.GT
-LTE = TokenType.LTE
-GTE = TokenType.GTE
-COMMA = TokenType.COMMA
-LPAREN = TokenType.LPAREN
-RPAREN = TokenType.RPAREN
-LBRACE = TokenType.LBRACE
-RBRACE = TokenType.RBRACE
-SEMICOLON = TokenType.SEMICOLON
-LBRACKET = TokenType.LBRACKET
-RBRACKET = TokenType.RBRACKET
+for _token in TokenType:
+    globals()[_token.name] = _token
 
-__all__ = [name for name in globals() if name.isupper()]
+__all__ = ['TokenType', *TokenType.__members__]
