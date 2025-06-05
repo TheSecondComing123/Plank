@@ -9,41 +9,44 @@ class TokenType(Enum):
 	EOF = auto()  # End of File
 	IDENTIFIER = auto()  # Variable names (e.g., 'a', 'b', 'result')
 	INTEGER = auto()  # Integer literals (e.g., '10', '42')
-	STRING = auto()  # String literals (e.g., '"hello"', '" "')
+	STRING = auto()	 # String literals (e.g., '"hello"', '" "')
 	
 	# Arithmetic Operators
 	PLUS = auto()  # '+'
-	MINUS = auto()  # '-'
+	MINUS = auto()	# '-'
 	MULTIPLY = auto()  # '*'
-	DIVIDE = auto()  # '/'
+	DIVIDE = auto()	 # '/'
 	EXPONENT = auto()  # '**'
 	FLOOR_DIVIDE = auto()  # '//'
 	
 	# Assignment and Keywords
-	ASSIGN = auto()  # '<-'
-	KEYWORD_INT = auto()  # 'int' (for input type)
+	ASSIGN = auto()	 # '<-'
+	KEYWORD_INT = auto()  # 'int' (type)
+	KEYWORD_STRING = auto()	 # 'string' (type)
+	KEYWORD_BOOL = auto()  # 'bool' (type)
+	KEYWORD_LIST = auto()  # 'list' (type)
 	KEYWORD_OUT = auto()  # 'out' (for output statement)
 	
 	# For Loop Keywords and Operators
 	KEYWORD_FOR = auto()  # 'for'
 	RANGE_OP = auto()  # '..'
-	ARROW = auto()  # '->'
+	ARROW = auto()	# '->'
 	
 	# Augmented Assignment Operators
 	PLUS_ASSIGN = auto()  # '+<-'
 	MINUS_ASSIGN = auto()  # '-<-'
 	MULTIPLY_ASSIGN = auto()  # '*<-'
-	DIVIDE_ASSIGN = auto()  # '/<-'
+	DIVIDE_ASSIGN = auto()	# '/<-'
 	EXPONENT_ASSIGN = auto()  # '**<-'
 	FLOOR_DIVIDE_ASSIGN = auto()  # '//<-'
 	
 	# Boolean Literals and Logical Operators
 	KEYWORD_TRUE = auto()  # 'true'
-	KEYWORD_FALSE = auto()  # 'false'
+	KEYWORD_FALSE = auto()	# 'false'
 	KEYWORD_AND = auto()  # 'and'
 	KEYWORD_OR = auto()  # 'or'
 	KEYWORD_NOT = auto()  # 'not'
-	KEYWORD_WHILE = auto()  # 'while'
+	KEYWORD_WHILE = auto()	# 'while'
 	KEYWORD_IF = auto()  # 'if'
 	KEYWORD_ELSE = auto()  # 'else'
 	KEYWORD_C = auto()  # 'c' for curried functions
@@ -57,11 +60,11 @@ class TokenType(Enum):
 	GTE = auto()  # '>='
 	
 	# Punctuation
-	COMMA = auto()  # ','
-	LPAREN = auto()  # '('
-	RPAREN = auto()  # ')'
-	LBRACE = auto()  # '{'
-	RBRACE = auto()  # '}'
+	COMMA = auto()	# ','
+	LPAREN = auto()	 # '('
+	RPAREN = auto()	 # ')'
+	LBRACE = auto()	 # '{'
+	RBRACE = auto()	 # '}'
 	SEMICOLON = auto()  # ';'
 	
 	# List Punctuation
@@ -82,6 +85,9 @@ EXPONENT = TokenType.EXPONENT
 FLOOR_DIVIDE = TokenType.FLOOR_DIVIDE
 ASSIGN = TokenType.ASSIGN
 KEYWORD_INT = TokenType.KEYWORD_INT
+KEYWORD_STRING = TokenType.KEYWORD_STRING
+KEYWORD_BOOL = TokenType.KEYWORD_BOOL
+KEYWORD_LIST = TokenType.KEYWORD_LIST
 KEYWORD_OUT = TokenType.KEYWORD_OUT
 KEYWORD_FOR = TokenType.KEYWORD_FOR
 RANGE_OP = TokenType.RANGE_OP

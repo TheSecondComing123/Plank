@@ -11,7 +11,7 @@ class Callable:
 	def __init__(self, params, body, closure_env, is_curried=False, applied_args=None):
 		self.params = params
 		self.body = body
-		self.closure_env = closure_env  # The scope where the lambda was defined
+		self.closure_env = closure_env	# The scope where the lambda was defined
 		self.is_curried = is_curried
 		self.applied_args = applied_args if applied_args is not None else []
 	
@@ -221,7 +221,7 @@ class Interpreter:
 		"""
 		# A copy of the current scope stack is taken to form the closure environment.
 		# This allows the lambda to access variables from where it was defined.
-		closure_env = list(self.scopes)  # Create a copy of the scope stack
+		closure_env = list(self.scopes)	 # Create a copy of the scope stack
 		return Callable(node.params, node.body, closure_env, is_curried=node.is_curried)
 	
 	def visit_Call(self, node):
@@ -239,7 +239,7 @@ class Interpreter:
 		if func_obj.is_curried and len(combined_args) < len(func_obj.params):
 			# Return a new partially applied callable
 			return Callable(func_obj.params, func_obj.body, func_obj.closure_env,
-			                is_curried=True, applied_args=combined_args)
+					is_curried=True, applied_args=combined_args)
 		
 		if len(combined_args) != len(func_obj.params):
 			raise Exception(
@@ -258,11 +258,11 @@ class Interpreter:
 		
 		result = None
 		try:
-			if isinstance(func_obj.body, Program):  # If body is a block of statements
+			if isinstance(func_obj.body, Program):	# If body is a block of statements
 				# Execute each statement in the block
 				# The result of the last expression in the block is the return value
 				for statement in func_obj.body.statements:
-					result = self.visit(statement)  # Update result with each statement's return
+					result = self.visit(statement)	# Update result with each statement's return
 			else:  # Body is a single expression
 				result = self.visit(func_obj.body)
 		finally:
@@ -313,29 +313,66 @@ class Interpreter:
 		else:
 			raise Exception(f"Runtime error: Unknown augmented assignment operator {node.op.value}")
 		
-		self.assign_variable(var_name, new_val)  # Use assign_variable
+		self.assign_variable(var_name, new_val)	 # Use assign_variable
 	
 	def visit_InputStatement(self, node):
 		"""
-		Handle input: read a line from stdin, parse comma-separated integers,
-		and assign them to the specified variables.
+		Handle input for any supported type. Values are whitespace separated
+		similar to C++'s cin operator.
 		"""
 		try:
-			# Read a line from standard input
 			input_line = input()
-			# Split by comma and convert each part to an integer
-			input_values = [int(val.strip()) for val in input_line.split(',')]
-		except ValueError:
-			raise Exception("Runtime error: Invalid input. Expected comma-separated integers.")
+			if node.type_token.value == 'list' and len(node.variables) == 1:
+				parts = [input_line.strip()]
+			else:
+				parts = input_line.strip().split()
 		except EOFError:
 			raise Exception("Runtime error: Unexpected end of input during input statement.")
-		
-		if len(input_values) != len(node.variables):
-			raise Exception(f"Runtime error: Expected {len(node.variables)} inputs, but received {len(input_values)}.")
-		
-		# Assign the parsed values to the variables using assign_variable
+
+		if len(parts) != len(node.variables):
+			raise Exception(
+				f"Runtime error: Expected {len(node.variables)} inputs, but received {len(parts)}.")
+
+		def convert(val: str):
+			t = node.type_token.value
+			if t == 'int':
+				return int(val)
+			if t == 'string':
+				return val
+			if t == 'bool':
+				if val.lower() in ('true', '1', 't'):
+					return True
+				if val.lower() in ('false', '0', 'f'):
+					return False
+				raise ValueError
+			if t == 'list':
+				import ast
+				return ast.literal_eval(val)
+			return val
+
+		try:
+			input_values = [convert(p) for p in parts]
+		except (ValueError, SyntaxError):
+			raise Exception(f"Runtime error: Invalid input for type {node.type_token.value}.")
+
 		for i, var_node in enumerate(node.variables):
 			self.assign_variable(var_node.value, input_values[i])
+
+	def visit_TypeCast(self, node):
+		value = self.visit(node.expr)
+		t = node.type_token.value
+		try:
+			if t == 'int':
+				return int(value)
+			if t == 'string':
+				return str(value)
+			if t == 'bool':
+				return bool(value)
+			if t == 'list':
+				return list(value)
+		except Exception:
+			raise Exception(f"Runtime error: Cannot convert to {t}.")
+		raise Exception(f"Runtime error: Unknown type {t} in cast")
 	
 	def visit_OutputStatement(self, node):
 		"""

@@ -114,13 +114,13 @@ class Parser:
 			lexer_current_char_backup = self.lexer.current_char
 			parser_current_token_backup = self.current_token
 			try:
-				self.variable()  # Consume first IDENTIFIER
+				self.variable()	 # Consume first IDENTIFIER
 				while self.current_token.type == COMMA:
 					self.eat(COMMA)
 					self.variable()
 				if self.current_token.type == ASSIGN:
 					self.eat(ASSIGN)
-					if self.current_token.type == KEYWORD_INT:
+					if self.current_token.type in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST):
 						self.lexer.pos = lexer_pos_backup
 						self.lexer.current_char = lexer_current_char_backup
 						self.current_token = parser_current_token_backup
@@ -136,7 +136,7 @@ class Parser:
 			lexer_current_char_backup = self.lexer.current_char
 			parser_current_token_backup = self.current_token
 			try:
-				self.variable()  # Consume IDENTIFIER
+				self.variable()	 # Consume IDENTIFIER
 				if self.current_token.type == ASSIGN:
 					self.lexer.pos = lexer_pos_backup
 					self.lexer.current_char = lexer_current_char_backup
@@ -165,7 +165,8 @@ class Parser:
 	def input_statement(self):
 		"""
 		Parses an input statement.
-		input_statement ::= IDENTIFIER (COMMA IDENTIFIER)* ASSIGN KEYWORD_INT
+		input_statement ::= IDENTIFIER (COMMA IDENTIFIER)* ASSIGN TYPE
+		where TYPE is one of int, string, bool, list
 		"""
 		variables = [self.variable()]
 		while self.current_token.type == COMMA:
@@ -173,8 +174,11 @@ class Parser:
 			variables.append(self.variable())
 		
 		self.eat(ASSIGN)
-		self.eat(KEYWORD_INT)
-		return InputStatement(variables, Token(KEYWORD_INT, 'int'))
+		if self.current_token.type not in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST):
+			self.error("Expected type after '<-'")
+		type_token = self.current_token
+		self.eat(type_token.type)
+		return InputStatement(variables, Token(type_token.type, type_token.value))
 	
 	def output_statement(self):
 		"""
@@ -224,7 +228,7 @@ class Parser:
 		"""
 		var_node = self.variable()
 		op_token = self.current_token
-		self.eat(op_token.type)  # Consume the augmented assignment operator
+		self.eat(op_token.type)	 # Consume the augmented assignment operator
 		expr_node = self.expression()
 		return AugmentedAssign(var_node, op_token, expr_node)
 	
@@ -236,7 +240,7 @@ class Parser:
 		self.eat(LPAREN)  # Consume '('
 		loop_var = self.variable()  # Get the loop variable (e.g., 'x')
 		self.eat(KEYWORD_FOR)  # Consume 'for'
-		start_expr = self.expression()  # Get the start expression (e.g., '1')
+		start_expr = self.expression()	# Get the start expression (e.g., '1')
 		self.eat(RANGE_OP)  # Consume '..'
 		end_expr = self.expression()  # Get the end expression (e.g., '5')
 		step_expr = None
@@ -244,7 +248,7 @@ class Parser:
 			self.eat(RANGE_OP)
 			step_expr = self.expression()
 		self.eat(RPAREN)  # Consume ')'
-		self.eat(ARROW)  # Consume '->'
+		self.eat(ARROW)	 # Consume '->'
 		self.eat(LBRACE)  # Consume '{'
 		
 		body_statements = []
@@ -266,10 +270,10 @@ class Parser:
 		"""
 		self.eat(LPAREN)  # Consume '('
 		loop_var = self.variable()  # Consume the loop variable (e.g., 'x')
-		self.eat(KEYWORD_WHILE)  # Consume 'while'
+		self.eat(KEYWORD_WHILE)	 # Consume 'while'
 		condition = self.expression()  # Get the condition expression (e.g., 'x < 5')
 		self.eat(RPAREN)  # Consume ')'
-		self.eat(ARROW)  # Consume '->'
+		self.eat(ARROW)	 # Consume '->'
 		self.eat(LBRACE)  # Consume '{'
 		
 		body_statements = []
@@ -282,7 +286,7 @@ class Parser:
 		self.eat(RBRACE)  # Consume '}'
 		return WhileStatement(loop_var, condition, body_statements)
 	
-	def expression_statement(self):  # New: Parses an expression as a statement
+	def expression_statement(self):	 # New: Parses an expression as a statement
 		"""Parses an expression as a statement."""
 		node = self.expression()
 		return ExpressionStatement(node)
@@ -355,12 +359,33 @@ class Parser:
 		if self.current_token.type == KEYWORD_NOT:
 			token = self.current_token
 			self.eat(KEYWORD_NOT)
-			return UnaryOp(op=token, right=self.call_or_index_expression())
+			return UnaryOp(op=token, right=self.cast_expression())
 		elif self.current_token.type == MINUS:
 			token = self.current_token
 			self.eat(MINUS)
-			return UnaryOp(op=token, right=self.call_or_index_expression())
-		return self.call_or_index_expression()
+			return UnaryOp(op=token, right=self.cast_expression())
+		return self.cast_expression()
+
+	def cast_expression(self):
+		node = self.call_or_index_expression()
+		while self.current_token.type == ARROW:
+			# Peek ahead to ensure this is a type cast and not part of another construct
+			saved_pos = self.lexer.pos
+			saved_char = self.lexer.current_char
+			saved_token = self.current_token
+			next_token = self.lexer.get_next_token()
+			self.lexer.pos = saved_pos
+			self.lexer.current_char = saved_char
+			self.current_token = saved_token
+
+			if next_token.type not in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST):
+				break
+
+			self.eat(ARROW)
+			type_token = self.current_token
+			self.eat(type_token.type)
+			node = TypeCast(node, type_token)
+		return node
 	
 	def call_or_index_expression(self):  # Handles both indexing and function calls as postfix
 		"""
@@ -369,12 +394,12 @@ class Parser:
 		"""
 		node = self.primary()  # Start with a primary (variable, literal, lambda, etc.)
 		while self.current_token.type in (LBRACKET, LPAREN):
-			if self.current_token.type == LBRACKET:  # It's an index access
+			if self.current_token.type == LBRACKET:	 # It's an index access
 				self.eat(LBRACKET)
 				index_expr = self.expression()
 				self.eat(RBRACKET)
 				node = IndexAccess(node, index_expr)
-			elif self.current_token.type == LPAREN:  # It's a function call
+			elif self.current_token.type == LPAREN:	 # It's a function call
 				self.eat(LPAREN)
 				args = []
 				if self.current_token.type != RPAREN:  # Check if there are arguments
@@ -383,7 +408,7 @@ class Parser:
 						self.eat(COMMA)
 						args.append(self.expression())
 				self.eat(RPAREN)
-				node = Call(node, args)  # The node here is the function being called (e.g., Var('square'))
+				node = Call(node, args)	 # The node here is the function being called (e.g., Var('square'))
 		return node
 	
 	def primary(self):
@@ -409,24 +434,18 @@ class Parser:
 		elif token.type == LBRACKET:
 			return self.list_literal()
 		elif self.current_token.type == KEYWORD_C or self.current_token.type == LPAREN:
-			# Look ahead to distinguish lambda from simple parenthesized expression
 			lexer_pos_backup = self.lexer.pos
 			lexer_current_char_backup = self.lexer.current_char
 			parser_current_token_backup = self.current_token
 			is_curried = False
-			
+
 			if self.current_token.type == KEYWORD_C:
 				is_curried = True
-				self.eat(KEYWORD_C)  # Consume 'c'
-			
+				self.eat(KEYWORD_C)
+
 			if self.current_token.type == LPAREN:
 				self.eat(LPAREN)
-				# Check for `IDENTIFIER` or `RPAREN` immediately after `LPAREN`
-				# indicating start of parameters, then `ASSIGN` after `RPAREN`.
-				# (param1, param2) <- body
-				# () <- body
 				if self.current_token.type == IDENTIFIER or self.current_token.type == RPAREN:
-					# Parse params and check for ASSIGN token
 					if self.current_token.type == IDENTIFIER:
 						self.eat(IDENTIFIER)
 						while self.current_token.type == COMMA:
@@ -434,32 +453,22 @@ class Parser:
 							self.eat(IDENTIFIER)
 					self.eat(RPAREN)
 					if self.current_token.type == ASSIGN:
-						# It's a lambda, reset and parse it
 						self.lexer.pos = lexer_pos_backup
 						self.lexer.current_char = lexer_current_char_backup
 						self.current_token = parser_current_token_backup
 						return self.lambda_expression()
-					else:
-						# Not a lambda, assume it's just a parenthesized expression that started with params
-						raise Exception("Not a lambda definition")  # Force backtracking to regular expression
-				else:
-					raise Exception("Not a lambda definition")  # Force backtracking
-			else:  # If it was 'c' but not '(', it's an error
+				# restore and treat as parenthesized expression
+				self.lexer.pos = lexer_pos_backup
+				self.lexer.current_char = lexer_current_char_backup
+				self.current_token = parser_current_token_backup
+				self.eat(LPAREN)
+				node = self.expression()
+				self.eat(RPAREN)
+				return node
+			else:
 				if is_curried:
 					self.error("Expected '(' after 'c' for curried lambda.")
 				self.error("Expected integer, identifier, string, boolean, list, lambda, or '('")
-			
-			# If we reach here, it means it was a regular parenthesized expression
-			# This part is only reached if the try-except block above failed to identify a lambda.
-			# So, we restore state and parse as a regular parenthesized expression.
-			self.lexer.pos = lexer_pos_backup
-			self.lexer.current_char = lexer_current_char_backup
-			self.current_token = parser_current_token_backup
-			
-			self.eat(LPAREN)  # Consume LPAREN for the expression
-			node = self.expression()
-			self.eat(RPAREN)
-			return node
 		else:
 			self.error("Expected integer, identifier, string, boolean, list, lambda, or '('")
 	
@@ -509,7 +518,7 @@ class Parser:
 					if self.current_token.type != RBRACE and self.current_token.type != EOF:
 						body_statements.append(self.statement())
 			self.eat(RBRACE)
-			body = Program(body_statements)  # Body is a Program node
+			body = Program(body_statements)	 # Body is a Program node
 		else:
 			body = self.expression()  # Body is a single expression
 		
