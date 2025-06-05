@@ -23,7 +23,7 @@ class Lexer:
 	def __init__(self, text):
 		self.text = text
 		self.pos = 0  # Current position in the input text
-		self.current_char = self.text[self.pos] if self.text else None  # Current character
+		self.current_char = self.text[self.pos] if self.text else None	# Current character
 	
 	def advance(self):
 		"""Move to the next character in the input text."""
@@ -57,12 +57,12 @@ class Lexer:
 		"""Parse a string literal from the input (enclosed in double or single quotes).
 		Handles escape sequences: \n, \t, \\
 		"""
-		quote_char = self.current_char  # Capture the opening quote character
-		self.advance()  # Consume the opening quote
+		quote_char = self.current_char	# Capture the opening quote character
+		self.advance()	# Consume the opening quote
 		result = ''
 		while self.current_char is not None and self.current_char != quote_char:
 			if self.current_char == '\\':  # Handle escape sequences
-				self.advance()  # Consume the backslash
+				self.advance()	# Consume the backslash
 				if self.current_char == 'n':
 					result += '\n'
 				elif self.current_char == 't':
@@ -77,7 +77,7 @@ class Lexer:
 			self.advance()
 		if self.current_char is None:
 			raise Exception(f'Lexer error: Unclosed string literal starting with {quote_char} at position {self.pos}')
-		self.advance()  # Consume the closing quote
+		self.advance()	# Consume the closing quote
 		return result
 	
 	def _id(self):
@@ -88,6 +88,9 @@ class Lexer:
 			self.advance()
 		keywords = {
 			'int': (KEYWORD_INT, 'int'),
+			'string': (KEYWORD_STRING, 'string'),
+			'bool': (KEYWORD_BOOL, 'bool'),
+			'list': (KEYWORD_LIST, 'list'),
 			'out': (KEYWORD_OUT, 'out'),
 			'for': (KEYWORD_FOR, 'for'),
 			'true': (KEYWORD_TRUE, True),
@@ -108,7 +111,7 @@ class Lexer:
 	def get_next_token(self):
 		"""Get the next token from the input text."""
 		while self.current_char is not None:
-			self.skip_whitespace()  # Always skip whitespace before processing
+			self.skip_whitespace()	# Always skip whitespace before processing
 			
 			if self.current_char is None:  # Check again after skipping whitespace
 				break
@@ -125,36 +128,36 @@ class Lexer:
 			# Handle multi-character operators and augmented assignments (longest match first)
 			if self.current_char == '*':
 				if self.peek() == '*':
-					self.advance()  # Consume first '*'
+					self.advance()	# Consume first '*'
 					if self.peek() == '<' and self.peek(2) == '-':
-						self.advance()  # Consume second '*'
-						self.advance()  # Consume '<'
-						self.advance()  # Consume '-'
+						self.advance()	# Consume second '*'
+						self.advance()	# Consume '<'
+						self.advance()	# Consume '-'
 						return Token(EXPONENT_ASSIGN, '**<-')
-					self.advance()  # Consume second '*'
+					self.advance()	# Consume second '*'
 					return Token(EXPONENT, '**')
 				elif self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '*'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '*'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(MULTIPLY_ASSIGN, '*<-')
 				self.advance()
 				return Token(MULTIPLY, '*')
 			
 			if self.current_char == '/':
 				if self.peek() == '/':
-					self.advance()  # Consume first '/'
+					self.advance()	# Consume first '/'
 					if self.peek() == '<' and self.peek(2) == '-':
-						self.advance()  # Consume second '/'
-						self.advance()  # Consume '<'
-						self.advance()  # Consume '-'
+						self.advance()	# Consume second '/'
+						self.advance()	# Consume '<'
+						self.advance()	# Consume '-'
 						return Token(FLOOR_DIVIDE_ASSIGN, '//<-')
-					self.advance()  # Consume second '/'
+					self.advance()	# Consume second '/'
 					return Token(FLOOR_DIVIDE, '//')
 				elif self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '/'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '/'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(DIVIDE_ASSIGN, '/<-')
 				self.advance()
 				return Token(DIVIDE, '/')
@@ -192,22 +195,22 @@ class Lexer:
 			
 			if self.current_char == '-':
 				if self.peek() == '>':
-					self.advance()  # Consume '-'
-					self.advance()  # Consume '>'
+					self.advance()	# Consume '-'
+					self.advance()	# Consume '>'
 					return Token(ARROW, '->')
 				elif self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '-'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '-'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(MINUS_ASSIGN, '-<-')
 				self.advance()
 				return Token(MINUS, '-')
 			
 			if self.current_char == '+':
 				if self.peek() == '<' and self.peek(2) == '-':
-					self.advance()  # Consume '+'
-					self.advance()  # Consume '<'
-					self.advance()  # Consume '-'
+					self.advance()	# Consume '+'
+					self.advance()	# Consume '<'
+					self.advance()	# Consume '-'
 					return Token(PLUS_ASSIGN, '+<-')
 				self.advance()
 				return Token(PLUS, '+')
@@ -247,4 +250,4 @@ class Lexer:
 			
 			# If none of the above, it's an unexpected character
 			raise Exception(f'Lexer error: Invalid character "{self.current_char}" at position {self.pos}')
-		return Token(EOF, None)  # Return EOF when all input is processed
+		return Token(EOF, None)	 # Return EOF when all input is processed

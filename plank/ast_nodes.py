@@ -149,4 +149,10 @@ class IfExpression(AST):
 
 @dataclass(slots=True)
 class ExpressionStatement(AST):  # Expression used as a statement
-	expression: AST
+        expression: AST
+
+
+@dataclass(slots=True)
+class TypeCast(AST):
+        expr: AST
+        type_token: Token
