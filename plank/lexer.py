@@ -34,6 +34,13 @@ class Lexer:
                 'if': (KEYWORD_IF, 'if'),
                 'else': (KEYWORD_ELSE, 'else'),
                 'c': (KEYWORD_C, 'c'),
+                'len': (KEYWORD_LEN, 'len'),
+                'head': (KEYWORD_HEAD, 'head'),
+                'tail': (KEYWORD_TAIL, 'tail'),
+                'abs': (KEYWORD_ABS, 'abs'),
+                'min': (KEYWORD_MIN, 'min'),
+                'max': (KEYWORD_MAX, 'max'),
+                'clamp': (KEYWORD_CLAMP, 'clamp'),
         }
 
         MULTI_OPS = {
