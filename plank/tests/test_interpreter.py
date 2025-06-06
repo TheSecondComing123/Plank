@@ -71,6 +71,22 @@ class PlankTest(unittest.TestCase):
             Case("lst <- list; out <- lst[1]", "2", "[1, 2, 3]"),
             Case("out <- ('123' -> int) + 1", "124"),
         ],
+        "builtins": [
+            Case("out <- len([1, 2, 3])", 3),
+            Case("out <- len [1, 2, 3]", 3),
+            Case("out <- head([10,20,30])", 10),
+            Case("out <- head [10,20,30]", 10),
+            Case("out <- tail([1,2,3])", "[2, 3]"),
+            Case("out <- tail [1,2,3]", "[2, 3]"),
+            Case("out <- abs(-5)", 5),
+            Case("out <- abs -5", 5),
+            Case("out <- min(3, 7)", 3),
+            Case("out <- min 3, 7", 3),
+            Case("out <- max(3, 7)", 7),
+            Case("out <- max 3, 7", 7),
+            Case("out <- clamp(5, 0, 10)", 5),
+            Case("out <- clamp 5, 0, 10", 5),
+        ],
     }
 
     def test_sections(self):
