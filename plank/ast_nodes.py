@@ -131,7 +131,12 @@ class InputStatement(AST):
 
 @dataclass(slots=True)
 class OutputStatement(AST):
-	expressions: list
+        expressions: list
+
+
+@dataclass(slots=True)
+class ImportStatement(AST):
+        path_token: Token
 
 
 @dataclass(slots=True)

@@ -26,6 +26,7 @@ class Lexer:
                 'dict': (KEYWORD_DICT, 'dict'),
                 'set': (KEYWORD_SET, 'set'),
                 'out': (KEYWORD_OUT, 'out'),
+                'import': (KEYWORD_IMPORT, 'import'),
                 'for': (KEYWORD_FOR, 'for'),
                 'true': (KEYWORD_TRUE, True),
                 'false': (KEYWORD_FALSE, False),
