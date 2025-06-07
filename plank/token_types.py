@@ -27,6 +27,8 @@ class TokenType(Enum):
     KEYWORD_STRING = auto()  # 'string' (type)
     KEYWORD_BOOL = auto()  # 'bool' (type)
     KEYWORD_LIST = auto()  # 'list' (type)
+    KEYWORD_DICT = auto()  # 'dict' (type)
+    KEYWORD_SET = auto()  # 'set' (type)
     KEYWORD_OUT = auto()  # 'out' (for output statement)
     
     # For Loop Keywords and Operators

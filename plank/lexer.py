@@ -23,6 +23,8 @@ class Lexer:
                 'string': (KEYWORD_STRING, 'string'),
                 'bool': (KEYWORD_BOOL, 'bool'),
                 'list': (KEYWORD_LIST, 'list'),
+                'dict': (KEYWORD_DICT, 'dict'),
+                'set': (KEYWORD_SET, 'set'),
                 'out': (KEYWORD_OUT, 'out'),
                 'for': (KEYWORD_FOR, 'for'),
                 'true': (KEYWORD_TRUE, True),

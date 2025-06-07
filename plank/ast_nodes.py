@@ -70,7 +70,17 @@ class Var(AST):
 
 @dataclass(slots=True)
 class ListLiteral(AST):
-	elements: list
+        elements: list
+
+
+@dataclass(slots=True)
+class DictLiteral(AST):
+        pairs: list  # list of (key, value) tuples
+
+
+@dataclass(slots=True)
+class SetLiteral(AST):
+        elements: list
 
 
 @dataclass(slots=True)
