@@ -59,6 +59,11 @@ class Lexer:
                 'replace': (KEYWORD_REPLACE, 'replace'),
                 'zip': (KEYWORD_ZIP, 'zip'),
                 'enumerate': (KEYWORD_ENUMERATE, 'enumerate'),
+                'round': (KEYWORD_ROUND, 'round'),
+                'floor': (KEYWORD_FLOOR, 'floor'),
+                'ceil': (KEYWORD_CEIL, 'ceil'),
+                'sum': (KEYWORD_SUM, 'sum'),
+                'average': (KEYWORD_AVERAGE, 'average'),
         }
 
         MULTI_OPS = {

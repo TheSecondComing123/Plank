@@ -113,6 +113,12 @@ class PlankTest(unittest.TestCase):
             Case("out <- replace('hello', 'l', 'x')", 'hexxo'),
             Case("out <- zip([1,2], [3,4])[1][1]", 4),
             Case("out <- enumerate(['a','b'])[1][0]", 1),
+            Case("out <- round(3.6)", 4),
+            Case("out <- floor(3.9)", 3),
+            Case("out <- ceil(3.1)", 4),
+            Case("out <- sum([1,2,3])", 6),
+            Case("out <- average([2,4,6])", 4.0),
+            Case("out <- (1..3)[2]", 3),
         ],
         "comments": [
             Case("a <- 1 # assign a\nout <- a", 1),
