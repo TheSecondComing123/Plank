@@ -55,6 +55,7 @@ class TokenType(Enum):
     KEYWORD_BREAK = auto()  # 'break'
     KEYWORD_CONTINUE = auto()  # 'continue'
     KEYWORD_RETURN = auto()  # 'return'
+    KEYWORD_FN = auto()  # 'fn'
     KEYWORD_C = auto()  # 'c' for curried functions
     KEYWORD_LEN = auto()  # 'len'
     KEYWORD_HEAD = auto()  # 'head'

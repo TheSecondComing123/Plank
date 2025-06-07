@@ -68,6 +68,10 @@ class PlankTest(unittest.TestCase):
             Case("ret <- (x) <- { return x * 2; x * 3 }; out <- ret(4); out <- '\n'", 8),
             Case("sign <- (x) <- { if x > 0 -> { return 1 }; if x < 0 -> { return -1 }; 0 }; out <- sign(-5); out <- '\n'", -1),
         ],
+        "function_defs": [
+            Case("fn inc(x) -> { return x + 1 }; out <- inc(5); out <- '\n'", 6),
+            Case("fn fact(n) -> { if n == 0 -> { return 1 }; return n * fact(n - 1) }; out <- fact(5); out <- '\n'", 120),
+        ],
         "conditionals": [
             Case("x <- 5; result <- if x < 0 -> { 'negative' } else if x == 0 -> { 'zero' } else { 'positive' }; out <- result", "positive"),
         ],
