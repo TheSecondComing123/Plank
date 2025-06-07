@@ -31,7 +31,7 @@ class UnaryOp(AST):
 @dataclass(slots=True)
 class Num(AST):
 	token: Token
-	value: int | None = None
+	value: int | float | None = None
 	
 	def __post_init__(self):
 		if self.value is None:
