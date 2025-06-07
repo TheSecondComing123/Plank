@@ -103,6 +103,10 @@ class PlankTest(unittest.TestCase):
             Case("out <- zip([1,2], [3,4])[1][1]", 4),
             Case("out <- enumerate(['a','b'])[1][0]", 1),
         ],
+        "comments": [
+            Case("a <- 1 # assign a\nout <- a", 1),
+            Case("# only comment line\nout <- 2", 2),
+        ],
     }
 
     def test_sections(self):
