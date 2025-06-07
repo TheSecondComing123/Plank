@@ -65,6 +65,12 @@ class PlankTest(unittest.TestCase):
             Case("d <- {'x': 10, 'y': 20}; out <- d['x']", 10),
             Case("key <- 'b'; d <- {'a': 1, 'b': 2}; out <- d[key]", 2),
             Case("s <- {1,2,2,3}; out <- len(s)", 3),
+            Case("s <- {1}; push(s, 2); out <- len(s)", 2),
+            Case("d <- {'x': 1}; out <- pop(d, 'x')", 1),
+            Case("out <- foldl((a,b) <- a + b, 0, {1,2,3})", 6),
+            Case("out <- sort({3,1,2})[0]", 1),
+            Case("out <- len(enumerate({'a':1,'b':2}))", 2),
+            Case("out <- zip({1}, [2])[0][1]", 2),
         ],
         "functions": [
             Case("square <- (x) <- x * x; out <- square(4); out <- '\\n'", 16),
@@ -121,6 +127,8 @@ class PlankTest(unittest.TestCase):
             Case("out <- ceil(3.1)", 4),
             Case("out <- sum([1,2,3])", 6),
             Case("out <- average([2,4,6])", 4.0),
+            Case("out <- sum(map((x) <- x * 2, {1,2}))", 6),
+            Case("out <- sort(filter((x) <- x > 1, {1,2,3}))[0]", 2),
             Case("out <- (1..3)[2]", 3),
         ],
         "comments": [
