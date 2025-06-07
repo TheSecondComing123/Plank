@@ -30,6 +30,37 @@ class Interpreter:
         self.scopes = [{}]  # List of dictionaries, each dict is a scope. Global scope is the first.
         self._setup_builtins()
 
+    def _call_function(self, func_obj, args):
+        """Utility to call a function or builtin with given args."""
+        if callable(func_obj) and not isinstance(func_obj, Callable):
+            return func_obj(*args)
+        if not isinstance(func_obj, Callable):
+            raise Exception(f"Runtime error: Cannot call non-callable object {func_obj}.")
+
+        combined_args = func_obj.applied_args + args
+        if func_obj.is_curried and len(combined_args) < len(func_obj.params):
+            return Callable(func_obj.params, func_obj.body, func_obj.closure_env,
+                            is_curried=True, applied_args=combined_args)
+        if len(combined_args) != len(func_obj.params):
+            raise Exception(
+                f"Runtime error: Expected {len(func_obj.params)} arguments, got {len(combined_args)} for lambda call.")
+
+        original_scopes = list(self.scopes)
+        self.scopes = list(func_obj.closure_env)
+        self.enter_scope()
+        for param_node, arg_val in zip(func_obj.params, combined_args):
+            self.current_scope[param_node.value] = arg_val
+        result = None
+        try:
+            if isinstance(func_obj.body, Program):
+                for statement in func_obj.body.statements:
+                    result = self.visit(statement)
+            else:
+                result = self.visit(func_obj.body)
+        finally:
+            self.scopes = original_scopes
+        return result
+
     def _setup_builtins(self):
         def b_len(x):
             return len(x)
@@ -62,6 +93,82 @@ class Interpreter:
                 raise Exception("Runtime error: clamp expects numeric arguments")
             return max(lo, min(x, hi))
 
+        def b_push(lst, item):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: push expects a list")
+            lst.append(item)
+            return lst
+
+        def b_pop(lst):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: pop expects a list")
+            if not lst:
+                raise Exception("Runtime error: pop from empty list")
+            return lst.pop()
+
+        def b_map(func, lst):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: map expects a list")
+            return [self._call_function(func, [x]) for x in lst]
+
+        def b_filter(func, lst):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: filter expects a list")
+            return [x for x in lst if self._call_function(func, [x])]
+
+        def b_foldl(func, init, lst):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: foldl expects a list")
+            acc = init
+            for x in lst:
+                acc = self._call_function(func, [acc, x])
+            return acc
+
+        def b_foldr(func, init, lst):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: foldr expects a list")
+            acc = init
+            for x in reversed(lst):
+                acc = self._call_function(func, [x, acc])
+            return acc
+
+        def b_sort(lst):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: sort expects a list")
+            return sorted(lst)
+
+        def b_split(string, delim):
+            if not isinstance(string, str) or not isinstance(delim, str):
+                raise Exception("Runtime error: split expects a string and delimiter")
+            return string.split(delim)
+
+        def b_join(delim, lst):
+            if not isinstance(lst, list) or not all(isinstance(s, str) for s in lst):
+                raise Exception("Runtime error: join expects a list of strings")
+            if not isinstance(delim, str):
+                raise Exception("Runtime error: join expects a string delimiter")
+            return delim.join(lst)
+
+        def b_find(string, sub):
+            if not isinstance(string, str) or not isinstance(sub, str):
+                raise Exception("Runtime error: find expects two strings")
+            return string.find(sub)
+
+        def b_replace(string, old, new):
+            if not isinstance(string, str) or not isinstance(old, str) or not isinstance(new, str):
+                raise Exception("Runtime error: replace expects strings")
+            return string.replace(old, new)
+
+        def b_zip(a, b):
+            if not isinstance(a, list) or not isinstance(b, list):
+                raise Exception("Runtime error: zip expects two lists")
+            return [[x, y] for x, y in zip(a, b)]
+
+        def b_enumerate(lst):
+            if not isinstance(lst, list):
+                raise Exception("Runtime error: enumerate expects a list")
+            return [[i, v] for i, v in enumerate(lst)]
+
         builtins = {
             'len': b_len,
             'head': b_head,
@@ -70,6 +177,19 @@ class Interpreter:
             'min': b_min,
             'max': b_max,
             'clamp': b_clamp,
+            'push': b_push,
+            'pop': b_pop,
+            'map': b_map,
+            'filter': b_filter,
+            'foldl': b_foldl,
+            'foldr': b_foldr,
+            'sort': b_sort,
+            'split': b_split,
+            'join': b_join,
+            'find': b_find,
+            'replace': b_replace,
+            'zip': b_zip,
+            'enumerate': b_enumerate,
         }
         self.scopes[0].update(builtins)
     
@@ -185,6 +305,16 @@ class Interpreter:
                 return left_val // right_val
             case TokenType.EXPONENT:
                 return left_val ** right_val
+            case TokenType.COLON:
+                if isinstance(left_val, list) and isinstance(right_val, list):
+                    return left_val + right_val
+                if isinstance(left_val, list):
+                    new_list = list(left_val)
+                    new_list.append(right_val)
+                    return new_list
+                if isinstance(right_val, list):
+                    return [left_val] + right_val
+                raise Exception("Runtime error: ':' operator requires at least one list operand")
             case _:
                 raise Exception(f"Runtime error: Unknown binary operator {node.op.value}")
     
@@ -273,50 +403,8 @@ class Interpreter:
         Execute a function call.
         """
         func_obj = self.visit(node.func_expr)
-
         evaluated_new_args = [self.visit(arg_expr) for arg_expr in node.args]
-
-        if callable(func_obj) and not isinstance(func_obj, Callable):
-            return func_obj(*evaluated_new_args)
-
-        if not isinstance(func_obj, Callable):
-            raise Exception(f"Runtime error: Cannot call non-callable object {func_obj}.")
-        combined_args = func_obj.applied_args + evaluated_new_args
-        
-        if func_obj.is_curried and len(combined_args) < len(func_obj.params):
-            # Return a new partially applied callable
-            return Callable(func_obj.params, func_obj.body, func_obj.closure_env,
-                    is_curried=True, applied_args=combined_args)
-        
-        if len(combined_args) != len(func_obj.params):
-            raise Exception(
-                f"Runtime error: Expected {len(func_obj.params)} arguments, got {len(combined_args)} for lambda call.")
-        
-        # Save current scope stack
-        original_scopes = list(self.scopes)
-        
-        # Set scopes to the closure environment + a new local scope for the function call
-        self.scopes = list(func_obj.closure_env)  # Start with the closure env
-        self.enter_scope()  # Add a new local scope for function parameters and local vars
-        
-        # Map arguments to parameters in the new function's local scope
-        for param_node, arg_val in zip(func_obj.params, combined_args):
-            self.current_scope[param_node.value] = arg_val
-        
-        result = None
-        try:
-            if isinstance(func_obj.body, Program):  # If body is a block of statements
-                # Execute each statement in the block
-                # The result of the last expression in the block is the return value
-                for statement in func_obj.body.statements:
-                    result = self.visit(statement)  # Update result with each statement's return
-            else:  # Body is a single expression
-                result = self.visit(func_obj.body)
-        finally:
-            # Restore the original scope stack regardless of errors
-            self.scopes = original_scopes
-        
-        return result
+        return self._call_function(func_obj, evaluated_new_args)
     
     def visit_Assign(self, node):
         """Assign the result of an expression to a variable."""
