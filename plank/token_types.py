@@ -57,6 +57,19 @@ class TokenType(Enum):
     KEYWORD_MIN = auto()  # 'min'
     KEYWORD_MAX = auto()  # 'max'
     KEYWORD_CLAMP = auto()  # 'clamp'
+    KEYWORD_PUSH = auto()  # 'push'
+    KEYWORD_POP = auto()  # 'pop'
+    KEYWORD_MAP = auto()  # 'map'
+    KEYWORD_FILTER = auto()  # 'filter'
+    KEYWORD_FOLDL = auto()  # 'foldl'
+    KEYWORD_FOLDR = auto()  # 'foldr'
+    KEYWORD_SORT = auto()  # 'sort'
+    KEYWORD_SPLIT = auto()  # 'split'
+    KEYWORD_JOIN = auto()  # 'join'
+    KEYWORD_FIND = auto()  # 'find'
+    KEYWORD_REPLACE = auto()  # 'replace'
+    KEYWORD_ZIP = auto()  # 'zip'
+    KEYWORD_ENUMERATE = auto()  # 'enumerate'
     
     # Comparison Operators
     EQ = auto()  # '=='
@@ -73,6 +86,8 @@ class TokenType(Enum):
     LBRACE = auto()  # '{'
     RBRACE = auto()  # '}'
     SEMICOLON = auto()  # ';'
+
+    COLON = auto()  # ':'
     
     # List Punctuation
     LBRACKET = auto()  # '['
