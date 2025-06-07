@@ -372,21 +372,36 @@ class Interpreter:
     def visit_ListLiteral(self, node):
         """Evaluate a list literal by evaluating its elements."""
         return [self.visit(element_expr) for element_expr in node.elements]
+
+    def visit_DictLiteral(self, node):
+        """Evaluate a dictionary literal."""
+        return {self.visit(k): self.visit(v) for k, v in node.pairs}
+
+    def visit_SetLiteral(self, node):
+        """Evaluate a set literal."""
+        return {self.visit(e) for e in node.elements}
     
     def visit_IndexAccess(self, node):
-        """Access an element in a list using an index."""
-        list_obj = self.visit(node.list_expr)
-        index_val = self.visit(node.index_expr)
-        
-        if not isinstance(list_obj, list):
-            raise Exception(f"Runtime error: Cannot index non-list type {type(list_obj).__name__}.")
-        if not isinstance(index_val, int):
-            raise Exception(f"Runtime error: List index must be an integer, got {type(index_val).__name__}.")
-        
-        try:
-            return list_obj[index_val]
-        except IndexError:
-            raise Exception(f"Runtime error: List index {index_val} out of bounds for list of size {len(list_obj)}.")
+        """Access an element in a list or dictionary using an index/key."""
+        container = self.visit(node.list_expr)
+        key = self.visit(node.index_expr)
+
+        if isinstance(container, list):
+            if not isinstance(key, int):
+                raise Exception(f"Runtime error: List index must be an integer, got {type(key).__name__}.")
+            try:
+                return container[key]
+            except IndexError:
+                raise Exception(
+                    f"Runtime error: List index {key} out of bounds for list of size {len(container)}."
+                )
+        elif isinstance(container, dict):
+            try:
+                return container[key]
+            except KeyError:
+                raise Exception(f"Runtime error: Key {key!r} not found in dictionary.")
+        else:
+            raise Exception(f"Runtime error: Cannot index non-list type {type(container).__name__}.")
     
     def visit_ListAssign(self, node):
         """Assign a value to an element at a specific index in a list."""
@@ -506,7 +521,7 @@ class Interpreter:
                 if val.lower() in ('false', '0', 'f'):
                     return False
                 raise ValueError
-            if t == 'list':
+            if t in ('list', 'dict', 'set'):
                 import ast
                 return ast.literal_eval(val)
             return val
@@ -531,6 +546,10 @@ class Interpreter:
                 return bool(value)
             if t == 'list':
                 return list(value)
+            if t == 'dict':
+                return dict(value)
+            if t == 'set':
+                return set(value)
         except Exception:
             raise Exception(f"Runtime error: Cannot convert to {t}.")
         raise Exception(f"Runtime error: Unknown type {t} in cast")

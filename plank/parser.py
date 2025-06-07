@@ -128,7 +128,7 @@ class Parser:
                     self.variable()
                 if self.current_token.type == ASSIGN:
                     self.eat(ASSIGN)
-                    if self.current_token.type in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST):
+                    if self.current_token.type in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST, KEYWORD_DICT, KEYWORD_SET):
                         self.lexer.pos = lexer_pos_backup
                         self.lexer.current_char = lexer_current_char_backup
                         self.current_token = parser_current_token_backup
@@ -182,7 +182,7 @@ class Parser:
             variables.append(self.variable())
         
         self.eat(ASSIGN)
-        if self.current_token.type not in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST):
+        if self.current_token.type not in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST, KEYWORD_DICT, KEYWORD_SET):
             self.error("Expected type after '<-'")
         type_token = self.current_token
         self.eat(type_token.type)
@@ -398,7 +398,7 @@ class Parser:
             self.lexer.current_char = saved_char
             self.current_token = saved_token
 
-            if next_token.type not in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST):
+            if next_token.type not in (KEYWORD_INT, KEYWORD_STRING, KEYWORD_BOOL, KEYWORD_LIST, KEYWORD_DICT, KEYWORD_SET):
                 break
 
             self.eat(ARROW)
@@ -461,6 +461,8 @@ class Parser:
             return Boolean(token)
         elif token.type == LBRACKET:
             return self.list_literal()
+        elif token.type == LBRACE:
+            return self.dict_or_set_literal()
         elif self.current_token.type == KEYWORD_C or self.current_token.type == LPAREN:
             lexer_pos_backup = self.lexer.pos
             lexer_current_char_backup = self.lexer.current_char
@@ -514,6 +516,56 @@ class Parser:
                 elements.append(self.expression())
         self.eat(RBRACKET)
         return ListLiteral(elements)
+
+    def _expression_no_colon(self):
+        original_add = self.additive_expression
+
+        def additive_no_colon():
+            node = self.multiplicative_expression()
+            while self.current_token.type in (PLUS, MINUS):
+                token = self.current_token
+                self.eat(token.type)
+                node = BinOp(left=node, op=token, right=self.multiplicative_expression())
+            return node
+
+        self.additive_expression = additive_no_colon
+        node = self.expression()
+        self.additive_expression = original_add
+        return node
+
+    def dict_or_set_literal(self):
+        """Parse a dictionary or set literal enclosed in braces."""
+        self.eat(LBRACE)
+        if self.current_token.type == RBRACE:
+            self.eat(RBRACE)
+            return DictLiteral([])
+
+        first_expr = self._expression_no_colon()
+        if self.current_token.type == COLON:
+            # Dictionary literal
+            self.eat(COLON)
+            first_value = self.expression()
+            pairs = [(first_expr, first_value)]
+            while self.current_token.type == COMMA:
+                self.eat(COMMA)
+                if self.current_token.type == RBRACE:
+                    break
+                key_expr = self._expression_no_colon()
+                self.eat(COLON)
+                value_expr = self.expression()
+                pairs.append((key_expr, value_expr))
+            self.eat(RBRACE)
+            return DictLiteral(pairs)
+        else:
+            # Set literal
+            elements = [first_expr]
+            while self.current_token.type == COMMA:
+                self.eat(COMMA)
+                if self.current_token.type == RBRACE:
+                    break
+                elements.append(self.expression())
+            self.eat(RBRACE)
+            return SetLiteral(elements)
 
     def builtin_call(self):
         token = self.current_token
