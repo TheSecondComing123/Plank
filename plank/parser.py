@@ -149,8 +149,8 @@ class Parser:
                     self.current_token = parser_current_token_backup
                     return self.assignment_statement()
                 elif self.current_token.type in (
-                        PLUS_ASSIGN, MINUS_ASSIGN, MULTIPLY_ASSIGN, DIVIDE_ASSIGN, EXPONENT_ASSIGN,
-                        FLOOR_DIVIDE_ASSIGN):
+                        PLUS_ASSIGN, MINUS_ASSIGN, MULTIPLY_ASSIGN, DIVIDE_ASSIGN, MODULUS_ASSIGN,
+                        EXPONENT_ASSIGN, FLOOR_DIVIDE_ASSIGN):
                     self.lexer.pos = lexer_pos_backup
                     self.lexer.current_char = lexer_current_char_backup
                     self.current_token = parser_current_token_backup
@@ -340,14 +340,16 @@ class Parser:
         return node
     
     def multiplicative_expression(self):
-        """Handles '*', '/', '//' operators."""
+        """Handles '*', '/', '%', '//' operators."""
         node = self.exponentiation_expression()
-        while self.current_token.type in (MULTIPLY, DIVIDE, FLOOR_DIVIDE):
+        while self.current_token.type in (MULTIPLY, DIVIDE, MODULUS, FLOOR_DIVIDE):
             token = self.current_token
             if token.type == MULTIPLY:
                 self.eat(MULTIPLY)
             elif token.type == DIVIDE:
                 self.eat(DIVIDE)
+            elif token.type == MODULUS:
+                self.eat(MODULUS)
             elif token.type == FLOOR_DIVIDE:
                 self.eat(FLOOR_DIVIDE)
             node = BinOp(left=node, op=token, right=self.exponentiation_expression())
