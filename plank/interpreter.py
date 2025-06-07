@@ -1,8 +1,11 @@
 import sys
+from pathlib import Path
 
 from plank.ast_nodes import *
 from plank.token_types import *
 from plank.token_types import TokenType
+from plank.lexer import Lexer
+from plank.parser import Parser
 
 
 class BreakSignal(Exception):
@@ -41,6 +44,8 @@ class Interpreter:
     def __init__(self, parser=None):
         self.parser = parser
         self.scopes = [{}]  # List of dictionaries, each dict is a scope. Global scope is the first.
+        self.modules = {}
+        self.builtin_names = set()
         self._setup_builtins()
 
     def _call_function(self, func_obj, args):
@@ -211,6 +216,7 @@ class Interpreter:
             'enumerate': b_enumerate,
         }
         self.scopes[0].update(builtins)
+        self.builtin_names.update(builtins.keys())
     
     @property
     def current_scope(self):
@@ -543,6 +549,25 @@ class Interpreter:
         for expr in node.expressions:
             value = self.visit(expr)
             sys.stdout.write(str(value))
+
+    def visit_ImportStatement(self, node):
+        path = self.visit(node.path)
+        if not isinstance(path, str):
+            raise Exception("Runtime error: import path must be a string")
+        path = str(Path(path))
+        if path not in self.modules:
+            with open(path, 'r') as f:
+                code = f.read()
+            lexer = Lexer(code)
+            parser = Parser(lexer)
+            sub_interp = Interpreter(parser)
+            sub_interp.modules = self.modules
+            sub_interp.builtin_names = self.builtin_names
+            sub_interp.interpret()
+            exports = {k: v for k, v in sub_interp.scopes[0].items()
+                       if k not in sub_interp.builtin_names}
+            self.modules[path] = exports
+        self.scopes[0].update(self.modules[path])
     
     def visit_ForStatement(self, node):
         """

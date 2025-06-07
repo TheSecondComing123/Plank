@@ -42,12 +42,14 @@ class Parser:
     def statement(self):
         """
         Parses a single statement.
-        statement ::= output_statement | for_statement | while_statement |
-                      input_statement | list_assignment_statement |
+        statement ::= import_statement | output_statement | for_statement |
+                      while_statement | input_statement | list_assignment_statement |
                       assignment_statement | augmented_assignment_statement |
                       expression_statement
         """
         # Try parsing specific statement types first
+        if self.current_token.type == KEYWORD_IMPORT:
+            return self.import_statement()
         if self.current_token.type == KEYWORD_OUT:
             return self.output_statement()
         elif self.current_token.type == KEYWORD_BREAK:
@@ -205,6 +207,15 @@ class Parser:
             expressions.append(self.expression())
         
         return OutputStatement(expressions)
+
+    def import_statement(self):
+        """Parses an import statement."""
+        self.eat(KEYWORD_IMPORT)
+        if self.current_token.type != STRING:
+            self.error("Expected string literal after 'import'")
+        token = self.current_token
+        self.eat(STRING)
+        return ImportStatement(String(token))
     
     def assignment_statement(self):
         """

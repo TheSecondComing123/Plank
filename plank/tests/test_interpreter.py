@@ -1,5 +1,7 @@
 import contextlib
 import io
+import os
+import tempfile
 import unittest
 import unittest.mock
 from dataclasses import dataclass
@@ -125,6 +127,18 @@ class PlankTest(unittest.TestCase):
                         expected_str = str(case.expected)
                         out = output if isinstance(case.expected, str) and case.expected.endswith("\n") else output.rstrip("\n")
                         self.assertEqual(out, expected_str)
+
+    def test_imports(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mod1 = os.path.join(tmpdir, "mod1.plank")
+            with open(mod1, "w") as f:
+                f.write("x <- 3")
+            mod2 = os.path.join(tmpdir, "mod2.plank")
+            with open(mod2, "w") as f:
+                f.write(f"import '{mod1}'; y <- x * 2")
+            code = f"import '{mod2}'; out <- y"
+            _, output = run(code)
+            self.assertEqual(output, "6")
 
 
 if __name__ == "__main__":

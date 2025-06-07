@@ -57,6 +57,7 @@ class Lexer:
                 'replace': (KEYWORD_REPLACE, 'replace'),
                 'zip': (KEYWORD_ZIP, 'zip'),
                 'enumerate': (KEYWORD_ENUMERATE, 'enumerate'),
+                'import': (KEYWORD_IMPORT, 'import'),
         }
 
         MULTI_OPS = {

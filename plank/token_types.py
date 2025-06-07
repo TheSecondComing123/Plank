@@ -76,6 +76,9 @@ class TokenType(Enum):
     KEYWORD_REPLACE = auto()  # 'replace'
     KEYWORD_ZIP = auto()  # 'zip'
     KEYWORD_ENUMERATE = auto()  # 'enumerate'
+
+    # Module Import
+    KEYWORD_IMPORT = auto()  # 'import'
     
     # Comparison Operators
     EQ = auto()  # '=='
