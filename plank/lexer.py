@@ -33,6 +33,8 @@ class Lexer:
                 'while': (KEYWORD_WHILE, 'while'),
                 'if': (KEYWORD_IF, 'if'),
                 'else': (KEYWORD_ELSE, 'else'),
+                'break': (KEYWORD_BREAK, 'break'),
+                'continue': (KEYWORD_CONTINUE, 'continue'),
                 'c': (KEYWORD_C, 'c'),
                 'len': (KEYWORD_LEN, 'len'),
                 'head': (KEYWORD_HEAD, 'head'),
