@@ -62,6 +62,9 @@ class PlankTest(unittest.TestCase):
         "dicts and sets": [
             Case("d <- {'a': 1, 'b': 2}; out <- d['b']; out <- '\\n'", 2),
             Case("out <- len({1,2,3})", 3),
+            Case("d <- {'x': 10, 'y': 20}; out <- d['x']", 10),
+            Case("key <- 'b'; d <- {'a': 1, 'b': 2}; out <- d[key]", 2),
+            Case("s <- {1,2,2,3}; out <- len(s)", 3),
         ],
         "functions": [
             Case("square <- (x) <- x * x; out <- square(4); out <- '\\n'", 16),
