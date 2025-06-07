@@ -98,16 +98,9 @@ class ListAssign(AST):
 
 @dataclass(slots=True)
 class Lambda(AST):
-        params: list
-        body: AST
-        is_curried: bool = False
-
-
-@dataclass(slots=True)
-class FunctionDef(AST):
-        name: Var
-        params: list
-        body: Program
+	params: list
+	body: AST
+	is_curried: bool = False
 
 
 @dataclass(slots=True)
