@@ -70,6 +70,7 @@ class TokenType(Enum):
     KEYWORD_REPLACE = auto()  # 'replace'
     KEYWORD_ZIP = auto()  # 'zip'
     KEYWORD_ENUMERATE = auto()  # 'enumerate'
+    KEYWORD_RETURN = auto()  # 'return'
     
     # Comparison Operators
     EQ = auto()  # '=='

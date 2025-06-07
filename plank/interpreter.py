@@ -5,6 +5,12 @@ from plank.token_types import *
 from plank.token_types import TokenType
 
 
+# Internal exception used for returning from lambdas
+class ReturnSignal(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
 # --- Interpreter ---
 # Represents a callable function created from a Lambda AST node.
 class Callable:
@@ -53,8 +59,14 @@ class Interpreter:
         result = None
         try:
             if isinstance(func_obj.body, Program):
-                for statement in func_obj.body.statements:
-                    result = self.visit(statement)
+                try:
+                    last_result = None
+                    for statement in func_obj.body.statements:
+                        last_result = self.visit(statement)
+                except ReturnSignal as r:
+                    result = r.value
+                else:
+                    result = last_result
             else:
                 result = self.visit(func_obj.body)
         finally:
@@ -580,6 +592,10 @@ class Interpreter:
     def visit_ExpressionStatement(self, node):  # New: Visit method for ExpressionStatement
         """Evaluates the expression within an ExpressionStatement."""
         return self.visit(node.expression)
+
+    def visit_Return(self, node):
+        value = self.visit(node.expression) if node.expression is not None else None
+        raise ReturnSignal(value)
     
     def interpret(self):
         """Start the interpretation process by parsing the program and visiting its AST."""

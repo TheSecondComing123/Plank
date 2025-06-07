@@ -156,3 +156,8 @@ class ExpressionStatement(AST):  # Expression used as a statement
 class TypeCast(AST):
         expr: AST
         type_token: Token
+
+
+@dataclass(slots=True)
+class Return(AST):
+        expression: AST | None = None
