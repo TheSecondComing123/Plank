@@ -30,7 +30,6 @@ class TokenType(Enum):
     KEYWORD_DICT = auto()  # 'dict' (type)
     KEYWORD_SET = auto()  # 'set' (type)
     KEYWORD_OUT = auto()  # 'out' (for output statement)
-    KEYWORD_IMPORT = auto()  # 'import' keyword
     
     # For Loop Keywords and Operators
     KEYWORD_FOR = auto()  # 'for'
