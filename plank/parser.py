@@ -49,9 +49,7 @@ class Parser:
                       expression_statement
         """
         # Try parsing specific statement types first
-        if self.current_token.type == KEYWORD_IMPORT:
-            return self.import_statement()
-        elif self.current_token.type == KEYWORD_OUT:
+        if self.current_token.type == KEYWORD_OUT:
             return self.output_statement()
         elif self.current_token.type == KEYWORD_BREAK:
             self.eat(KEYWORD_BREAK)
@@ -174,15 +172,7 @@ class Parser:
         # If it's none of the above, it must be an expression statement (e.g., a literal, a function call)
         else:
             return self.expression_statement()
-
-    def import_statement(self):
-        self.eat(KEYWORD_IMPORT)
-        if self.current_token.type != STRING:
-            self.error("Expected string after 'import'")
-        token = self.current_token
-        self.eat(STRING)
-        return ImportStatement(token)
-
+    
     def input_statement(self):
         """
         Parses an input statement.
