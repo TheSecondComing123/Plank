@@ -50,6 +50,12 @@ class Parser:
         # Try parsing specific statement types first
         if self.current_token.type == KEYWORD_OUT:
             return self.output_statement()
+        elif self.current_token.type == KEYWORD_BREAK:
+            self.eat(KEYWORD_BREAK)
+            return BreakStatement()
+        elif self.current_token.type == KEYWORD_CONTINUE:
+            self.eat(KEYWORD_CONTINUE)
+            return ContinueStatement()
         elif self.current_token.type == LPAREN:
             # Look ahead for 'for' or 'while' to distinguish loops from expressions
             lexer_pos_backup = self.lexer.pos

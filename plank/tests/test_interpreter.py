@@ -48,6 +48,8 @@ class PlankTest(unittest.TestCase):
             Case("(x for 2..10..2) -> { out <- x out <- ' ' }", "2 4 6 8 10 "),
             Case("(x for 5..1..-1) -> { out <- x out <- ' ' }", "5 4 3 2 1 "),
             Case("x <- 0; (x while x < 5) -> { out <- x; x +<- 1; out <- '\\n' }", None),
+            Case("(x for 1..5) -> { out <- x; out <- ' '; if x == 3 -> { break } }", "1 2 3 "),
+            Case("x <- 0; (x while true) -> { x +<- 1; if x == 5 -> { break }; if x == 3 -> { continue }; out <- x; out <- ' ' }", "1 2 4 "),
         ],
         "lists": [
             Case("my_list <- [10, 'hello', true]; out <- my_list[1]; out <- '\\n'", "hello"),
