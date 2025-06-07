@@ -9,6 +9,7 @@ class TokenType(Enum):
     EOF = auto()  # End of File
     IDENTIFIER = auto()  # Variable names (e.g., 'a', 'b', 'result')
     INTEGER = auto()  # Integer literals (e.g., '10', '42')
+    FLOAT = auto()  # Floating point literals (e.g., '3.14', '0.5')
     STRING = auto()  # String literals (e.g., '"hello"', '" "')
     
     # Arithmetic Operators

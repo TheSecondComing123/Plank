@@ -416,7 +416,7 @@ class Parser:
     def primary(self):
         """
         Parses the highest precedence elements: numbers, variables, strings, booleans, list literals, lambda expressions, or parenthesized expressions.
-        primary ::= INTEGER | IDENTIFIER | STRING | BOOLEAN | ListLiteral | Lambda | LPAREN expression RPAREN
+        primary ::= INTEGER | FLOAT | IDENTIFIER | STRING | BOOLEAN | ListLiteral | Lambda | LPAREN expression RPAREN
         """
         token = self.current_token
         if token.type == KEYWORD_IF:
@@ -428,6 +428,9 @@ class Parser:
             return self.builtin_call()
         if token.type == INTEGER:
             self.eat(INTEGER)
+            return Num(token)
+        if token.type == FLOAT:
+            self.eat(FLOAT)
             return Num(token)
         elif token.type == IDENTIFIER:
             self.eat(IDENTIFIER)
