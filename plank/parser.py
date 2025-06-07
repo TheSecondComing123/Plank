@@ -56,6 +56,8 @@ class Parser:
         elif self.current_token.type == KEYWORD_CONTINUE:
             self.eat(KEYWORD_CONTINUE)
             return ContinueStatement()
+        elif self.current_token.type == KEYWORD_RETURN:
+            return self.return_statement()
         elif self.current_token.type == LPAREN:
             # Look ahead for 'for' or 'while' to distinguish loops from expressions
             lexer_pos_backup = self.lexer.pos
@@ -237,6 +239,14 @@ class Parser:
         self.eat(op_token.type)  # Consume the augmented assignment operator
         expr_node = self.expression()
         return AugmentedAssign(var_node, op_token, expr_node)
+
+    def return_statement(self):
+        """Parses a return statement with an optional expression."""
+        self.eat(KEYWORD_RETURN)
+        expr = None
+        if self.current_token.type not in (SEMICOLON, RBRACE, EOF):
+            expr = self.expression()
+        return Return(expr)
     
     def for_statement(self):
         """

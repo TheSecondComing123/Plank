@@ -63,6 +63,8 @@ class PlankTest(unittest.TestCase):
             Case("closure_example <- (y) <- (x) <- x + y; f <- closure_example(10); out <- f(5); out <- '\\n'", 15),
             Case("adder_block <- (x) <- { y <- x + 1; y }; out <- adder_block(4); out <- '\\n'", 5),
             Case("curried_sum <- c(a, b) <- a + b; add_five <- curried_sum(5); out <- add_five(3); out <- '\\n'", 8),
+            Case("ret <- (x) <- { return x * 2; x * 3 }; out <- ret(4); out <- '\n'", 8),
+            Case("sign <- (x) <- { if x > 0 -> { return 1 }; if x < 0 -> { return -1 }; 0 }; out <- sign(-5); out <- '\n'", -1),
         ],
         "conditionals": [
             Case("x <- 5; result <- if x < 0 -> { 'negative' } else if x == 0 -> { 'zero' } else { 'positive' }; out <- result", "positive"),

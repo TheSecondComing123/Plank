@@ -35,6 +35,7 @@ class Lexer:
                 'else': (KEYWORD_ELSE, 'else'),
                 'break': (KEYWORD_BREAK, 'break'),
                 'continue': (KEYWORD_CONTINUE, 'continue'),
+                'return': (KEYWORD_RETURN, 'return'),
                 'c': (KEYWORD_C, 'c'),
                 'len': (KEYWORD_LEN, 'len'),
                 'head': (KEYWORD_HEAD, 'head'),
