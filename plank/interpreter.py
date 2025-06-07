@@ -307,6 +307,10 @@ class Interpreter:
                 if right_val == 0:
                     raise Exception("Runtime error: Division by zero")
                 return left_val / right_val
+            case TokenType.MODULUS:
+                if right_val == 0:
+                    raise Exception("Runtime error: Division by zero")
+                return left_val % right_val
             case TokenType.FLOOR_DIVIDE:
                 if right_val == 0:
                     raise Exception("Runtime error: Division by zero")
@@ -448,6 +452,9 @@ class Interpreter:
         elif node.op.type == DIVIDE_ASSIGN:
             if expr_val == 0: raise Exception("Runtime error: Division by zero")
             new_val = current_val / expr_val
+        elif node.op.type == MODULUS_ASSIGN:
+            if expr_val == 0: raise Exception("Runtime error: Division by zero")
+            new_val = current_val % expr_val
         elif node.op.type == FLOOR_DIVIDE_ASSIGN:
             if expr_val == 0: raise Exception("Runtime error: Division by zero")
             new_val = current_val // expr_val
