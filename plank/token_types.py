@@ -16,6 +16,7 @@ class TokenType(Enum):
     MINUS = auto()  # '-'
     MULTIPLY = auto()  # '*'
     DIVIDE = auto()  # '/'
+    MODULUS = auto()  # '%'
     EXPONENT = auto()  # '**'
     FLOOR_DIVIDE = auto()  # '//'
     
@@ -37,6 +38,7 @@ class TokenType(Enum):
     MINUS_ASSIGN = auto()  # '-<-'
     MULTIPLY_ASSIGN = auto()  # '*<-'
     DIVIDE_ASSIGN = auto()  # '/<-'
+    MODULUS_ASSIGN = auto()  # '%<-'
     EXPONENT_ASSIGN = auto()  # '**<-'
     FLOOR_DIVIDE_ASSIGN = auto()  # '//<-'
     

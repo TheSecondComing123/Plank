@@ -33,6 +33,8 @@ class PlankTest(unittest.TestCase):
         "arithmetic": [
             Case("a <- 10; b <- 5; out <- a + b", 15),
             Case("a <- 0; a +<- 2; out <- a", 2),
+            Case("out <- 10 % 3", 1),
+            Case("a <- 7; a %<- 4; out <- a", 3),
         ],
         "strings": [
             Case("out <- 'Hello' <- ' ' <- 'World!'", "Hello World!"),
