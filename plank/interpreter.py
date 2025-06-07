@@ -159,6 +159,88 @@ class Interpreter:
                     raise Exception(f"Runtime error: Key {key!r} not found in dictionary.")
             raise Exception("Runtime error: pop expects a mutable sequence, set, or dict")
 
+        def b_contains(container, item):
+            return item in container
+
+        def b_remove(container, key_or_item):
+            if isinstance(container, MutableSequence):
+                if not isinstance(key_or_item, int):
+                    raise Exception("Runtime error: remove index must be integer")
+                try:
+                    del container[key_or_item]
+                    return container
+                except IndexError:
+                    raise Exception("Runtime error: remove index out of range")
+            if isinstance(container, MutableSet):
+                try:
+                    container.remove(key_or_item)
+                except KeyError:
+                    raise Exception(f"Runtime error: item {key_or_item!r} not found in set")
+                return container
+            if isinstance(container, MutableMapping):
+                try:
+                    del container[key_or_item]
+                    return container
+                except KeyError:
+                    raise Exception(f"Runtime error: Key {key_or_item!r} not found in dictionary.")
+            raise Exception("Runtime error: remove expects a mutable sequence, set, or dict")
+
+        def b_insert(seq, index, value):
+            if not isinstance(seq, MutableSequence):
+                raise Exception("Runtime error: insert expects a mutable sequence")
+            if not isinstance(index, int):
+                raise Exception("Runtime error: insert index must be integer")
+            seq.insert(index, value)
+            return seq
+
+        def b_extend(container, iterable_or_mapping):
+            if isinstance(container, MutableSequence):
+                if not isinstance(iterable_or_mapping, Iterable):
+                    raise Exception("Runtime error: extend expects an iterable for sequence")
+                container.extend(iterable_or_mapping)
+                return container
+            if isinstance(container, MutableSet):
+                if not isinstance(iterable_or_mapping, Iterable):
+                    raise Exception("Runtime error: extend expects an iterable for set")
+                container.update(iterable_or_mapping)
+                return container
+            if isinstance(container, MutableMapping):
+                if not isinstance(iterable_or_mapping, Mapping):
+                    raise Exception("Runtime error: extend expects a mapping for dict")
+                container.update(iterable_or_mapping)
+                return container
+            raise Exception("Runtime error: extend expects a mutable sequence, set, or dict")
+
+        def b_keys(mapping):
+            if not isinstance(mapping, Mapping):
+                raise Exception("Runtime error: keys expects a mapping")
+            return list(mapping.keys())
+
+        def b_values(mapping):
+            if not isinstance(mapping, Mapping):
+                raise Exception("Runtime error: values expects a mapping")
+            return list(mapping.values())
+
+        def b_items(mapping):
+            if not isinstance(mapping, Mapping):
+                raise Exception("Runtime error: items expects a mapping")
+            return [[k, v] for k, v in mapping.items()]
+
+        def b_union(set_a, set_b):
+            if not isinstance(set_a, MutableSet) or not isinstance(set_b, MutableSet):
+                raise Exception("Runtime error: union expects two sets")
+            return set_a | set_b
+
+        def b_intersection(set_a, set_b):
+            if not isinstance(set_a, MutableSet) or not isinstance(set_b, MutableSet):
+                raise Exception("Runtime error: intersection expects two sets")
+            return set_a & set_b
+
+        def b_difference(set_a, set_b):
+            if not isinstance(set_a, MutableSet) or not isinstance(set_b, MutableSet):
+                raise Exception("Runtime error: difference expects two sets")
+            return set_a - set_b
+
         def b_map(func, iterable):
             if not isinstance(iterable, Iterable):
                 raise Exception("Runtime error: map expects an iterable")
@@ -276,6 +358,16 @@ class Interpreter:
             'clamp': b_clamp,
             'push': b_push,
             'pop': b_pop,
+            'contains': b_contains,
+            'remove': b_remove,
+            'insert': b_insert,
+            'extend': b_extend,
+            'keys': b_keys,
+            'values': b_values,
+            'items': b_items,
+            'union': b_union,
+            'intersection': b_intersection,
+            'difference': b_difference,
             'map': b_map,
             'filter': b_filter,
             'foldl': b_foldl,
