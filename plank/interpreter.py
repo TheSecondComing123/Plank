@@ -5,6 +5,14 @@ from plank.token_types import *
 from plank.token_types import TokenType
 
 
+class BreakSignal(Exception):
+    pass
+
+
+class ContinueSignal(Exception):
+    pass
+
+
 # --- Interpreter ---
 # Represents a callable function created from a Lambda AST node.
 class Callable:
@@ -539,8 +547,13 @@ class Interpreter:
             stop = end_val + (1 if step_val > 0 else -1)
             for i in range(start_val, stop, step_val):
                 self.current_scope[loop_var_name] = i  # Loop var specific to this scope
-                for statement in node.body:
-                    self.visit(statement)
+                try:
+                    for statement in node.body:
+                        self.visit(statement)
+                except ContinueSignal:
+                    continue
+                except BreakSignal:
+                    break
         finally:
             self.exit_scope()  # Ensure scope is exited even if error occurs
     
@@ -565,8 +578,17 @@ class Interpreter:
                 break  # Exit loop if condition is false
             
             # Execute loop body
-            for statement in node.body:
-                self.visit(statement)
+            continue_outer = False
+            try:
+                for statement in node.body:
+                    self.visit(statement)
+            except ContinueSignal:
+                continue_outer = True
+            except BreakSignal:
+                break
+
+            if continue_outer:
+                continue
     
     def visit_IfExpression(self, node):
         condition_val = self.visit(node.condition)
@@ -580,6 +602,12 @@ class Interpreter:
     def visit_ExpressionStatement(self, node):  # New: Visit method for ExpressionStatement
         """Evaluates the expression within an ExpressionStatement."""
         return self.visit(node.expression)
+
+    def visit_BreakStatement(self, node):
+        raise BreakSignal()
+
+    def visit_ContinueStatement(self, node):
+        raise ContinueSignal()
     
     def interpret(self):
         """Start the interpretation process by parsing the program and visiting its AST."""

@@ -153,6 +153,16 @@ class ExpressionStatement(AST):  # Expression used as a statement
 
 
 @dataclass(slots=True)
+class BreakStatement(AST):
+        pass
+
+
+@dataclass(slots=True)
+class ContinueStatement(AST):
+        pass
+
+
+@dataclass(slots=True)
 class TypeCast(AST):
         expr: AST
         type_token: Token
