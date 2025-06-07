@@ -1,4 +1,5 @@
 import sys
+import math
 
 from plank.ast_nodes import *
 from plank.token_types import *
@@ -188,6 +189,39 @@ class Interpreter:
                 raise Exception("Runtime error: enumerate expects a list")
             return [[i, v] for i, v in enumerate(lst)]
 
+        def b_round(x):
+            if not isinstance(x, (int, float)):
+                raise Exception("Runtime error: round expects a number")
+            return round(x)
+
+        def b_floor(x):
+            if not isinstance(x, (int, float)):
+                raise Exception("Runtime error: floor expects a number")
+            return math.floor(x)
+
+        def b_ceil(x):
+            if not isinstance(x, (int, float)):
+                raise Exception("Runtime error: ceil expects a number")
+            return math.ceil(x)
+
+        def b_sum(lst):
+            if not isinstance(lst, list) or not all(isinstance(i, (int, float)) for i in lst):
+                raise Exception("Runtime error: sum expects a list of numbers")
+            return sum(lst)
+
+        def b_average(lst):
+            if not isinstance(lst, list) or not lst or not all(isinstance(i, (int, float)) for i in lst):
+                raise Exception("Runtime error: average expects a non-empty list of numbers")
+            return sum(lst) / len(lst)
+
+        def b_range(start, end, step=None):
+            if step is None:
+                step = 1 if start <= end else -1
+            if not all(isinstance(v, int) for v in (start, end, step)):
+                raise Exception("Runtime error: range expects integer arguments")
+            stop = end + (1 if step > 0 else -1)
+            return list(range(start, stop, step))
+
         builtins = {
             'len': b_len,
             'head': b_head,
@@ -209,6 +243,12 @@ class Interpreter:
             'replace': b_replace,
             'zip': b_zip,
             'enumerate': b_enumerate,
+            'round': b_round,
+            'floor': b_floor,
+            'ceil': b_ceil,
+            'sum': b_sum,
+            'average': b_average,
+            'range': b_range,
         }
         self.scopes[0].update(builtins)
     

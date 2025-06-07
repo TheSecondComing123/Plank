@@ -78,6 +78,11 @@ class TokenType(Enum):
     KEYWORD_REPLACE = auto()  # 'replace'
     KEYWORD_ZIP = auto()  # 'zip'
     KEYWORD_ENUMERATE = auto()  # 'enumerate'
+    KEYWORD_ROUND = auto()  # 'round'
+    KEYWORD_FLOOR = auto()  # 'floor'
+    KEYWORD_CEIL = auto()  # 'ceil'
+    KEYWORD_SUM = auto()  # 'sum'
+    KEYWORD_AVERAGE = auto()  # 'average'
     
     # Comparison Operators
     EQ = auto()  # '=='

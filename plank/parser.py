@@ -9,6 +9,7 @@ class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
         self.current_token = self.lexer.get_next_token()  # The current token being processed
+        self.allow_range_literal = True
     
     def error(self, message="Invalid syntax"):
         """Report a parsing error."""
@@ -256,13 +257,24 @@ class Parser:
         self.eat(LPAREN)  # Consume '('
         loop_var = self.variable()  # Get the loop variable (e.g., 'x')
         self.eat(KEYWORD_FOR)  # Consume 'for'
+
+        saved_flag = self.allow_range_literal
+        self.allow_range_literal = False
         start_expr = self.expression()  # Get the start expression (e.g., '1')
+        self.allow_range_literal = saved_flag
+
         self.eat(RANGE_OP)  # Consume '..'
+
+        self.allow_range_literal = False
         end_expr = self.expression()  # Get the end expression (e.g., '5')
+        self.allow_range_literal = saved_flag
+
         step_expr = None
         if self.current_token.type == RANGE_OP:
             self.eat(RANGE_OP)
+            self.allow_range_literal = False
             step_expr = self.expression()
+            self.allow_range_literal = saved_flag
         self.eat(RPAREN)  # Consume ')'
         self.eat(ARROW)  # Consume '->'
         self.eat(LBRACE)  # Consume '{'
@@ -328,11 +340,28 @@ class Parser:
     
     def comparison_expression(self):
         """Handles comparison operators (==, !=, <, >, <=, >=)."""
-        node = self.additive_expression()
+        node = self.range_expression()
         while self.current_token.type in (EQ, NEQ, LT, GT, LTE, GTE):
             token = self.current_token
             self.eat(token.type)
-            node = BinOp(left=node, op=token, right=self.additive_expression())
+            node = BinOp(left=node, op=token, right=self.range_expression())
+        return node
+
+    def range_expression(self):
+        node = self.additive_expression()
+        if self.allow_range_literal and self.current_token.type == RANGE_OP:
+            start_expr = node
+            self.eat(RANGE_OP)
+            end_expr = self.additive_expression()
+            step_expr = None
+            if self.current_token.type == RANGE_OP:
+                self.eat(RANGE_OP)
+                step_expr = self.additive_expression()
+            func_token = Token(IDENTIFIER, 'range')
+            args = [start_expr, end_expr]
+            if step_expr is not None:
+                args.append(step_expr)
+            node = Call(Var(func_token), args)
         return node
     
     def additive_expression(self):
@@ -442,7 +471,8 @@ class Parser:
         if token.type in (KEYWORD_LEN, KEYWORD_HEAD, KEYWORD_TAIL, KEYWORD_ABS, KEYWORD_MIN, KEYWORD_MAX, KEYWORD_CLAMP,
                            KEYWORD_PUSH, KEYWORD_POP, KEYWORD_MAP, KEYWORD_FILTER, KEYWORD_FOLDL, KEYWORD_FOLDR,
                            KEYWORD_SORT, KEYWORD_SPLIT, KEYWORD_JOIN, KEYWORD_FIND, KEYWORD_REPLACE,
-                           KEYWORD_ZIP, KEYWORD_ENUMERATE):
+                           KEYWORD_ZIP, KEYWORD_ENUMERATE, KEYWORD_ROUND, KEYWORD_FLOOR, KEYWORD_CEIL,
+                           KEYWORD_SUM, KEYWORD_AVERAGE):
             return self.builtin_call()
         if token.type == INTEGER:
             self.eat(INTEGER)
