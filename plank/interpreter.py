@@ -4,6 +4,8 @@ import math
 from plank.ast_nodes import *
 from plank.token_types import *
 from plank.token_types import TokenType
+from plank.lexer import Lexer
+from plank.parser import Parser
 
 
 class BreakSignal(Exception):
@@ -42,6 +44,7 @@ class Interpreter:
     def __init__(self, parser=None):
         self.parser = parser
         self.scopes = [{}]  # List of dictionaries, each dict is a scope. Global scope is the first.
+        self.modules = {}
         self._setup_builtins()
 
     def _call_function(self, func_obj, args):
@@ -251,6 +254,7 @@ class Interpreter:
             'range': b_range,
         }
         self.scopes[0].update(builtins)
+        self.builtin_names = set(builtins.keys())
     
     @property
     def current_scope(self):
@@ -537,6 +541,30 @@ class Interpreter:
             raise Exception(f"Runtime error: Unknown augmented assignment operator {node.op.value}")
         
         self.assign_variable(var_name, new_val)  # Use assign_variable
+
+    def visit_ImportStatement(self, node):
+        path = node.path_token.value
+        if not path.endswith('.plank'):
+            path += '.plank'
+        if path in self.modules:
+            module_scope = self.modules[path]
+        else:
+            try:
+                with open(path, 'r') as f:
+                    code = f.read()
+            except FileNotFoundError:
+                raise Exception(f"Runtime error: Cannot find module '{path}'")
+            lexer = Lexer(code)
+            parser = Parser(lexer)
+            child = Interpreter(parser)
+            child.modules = self.modules
+            child.interpret()
+            module_scope = {
+                k: v for k, v in child.scopes[0].items()
+                if k not in child.builtin_names
+            }
+            self.modules[path] = module_scope
+        self.scopes[0].update(module_scope)
     
     def visit_InputStatement(self, node):
         """
