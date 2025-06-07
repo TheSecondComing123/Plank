@@ -118,13 +118,38 @@ class Lexer:
                 while self.current_char is not None and self.current_char.isspace():
                         self.advance()
         
-        def integer(self):
-                """Parse an integer literal from the input."""
+        def peek(self):
+                """Return the next character without consuming it."""
+                next_pos = self.pos + 1
+                if next_pos < len(self.text):
+                        return self.text[next_pos]
+                return None
+
+        def number(self):
+                """Parse an integer or floating point literal from the input."""
                 result = ''
-                while self.current_char is not None and self.current_char.isdigit():
-                        result += self.current_char
-                        self.advance()
-                return int(result)
+                has_decimal = False
+                while self.current_char is not None:
+                        if self.current_char.isdigit():
+                                result += self.current_char
+                                self.advance()
+                        elif self.current_char == '.':
+                                if self.peek() == '.':
+                                        break
+                                if has_decimal:
+                                        raise Exception(
+                                                f'Lexer error: Multiple decimal points in number starting at position {self.pos}'
+                                        )
+                                has_decimal = True
+                                result += self.current_char
+                                self.advance()
+                                if self.current_char is None or not self.current_char.isdigit():
+                                        raise Exception(
+                                                f'Lexer error: Invalid float literal at position {self.pos}'
+                                        )
+                        else:
+                                break
+                return float(result) if has_decimal else int(result)
         
         def string(self):
                 """Parse a string literal from the input (enclosed in double or single quotes).
@@ -170,7 +195,8 @@ class Lexer:
                                 break
 
                         if self.current_char.isdigit():
-                                return Token(INTEGER, self.integer())
+                                num = self.number()
+                                return Token(FLOAT if isinstance(num, float) else INTEGER, num)
 
                         if self.current_char in ('"', "'"):
                                 return Token(STRING, self.string())
@@ -182,10 +208,6 @@ class Lexer:
                                 if self.match(op):
                                         return Token(ttype, op)
 
-                        if self.current_char == '.':
-                                raise Exception(
-                                        f'Lexer error: Invalid character sequence starting with . at position {self.pos}'
-                                )
 
                         token_type = self.SINGLE_OPS.get(self.current_char)
                         if token_type:
