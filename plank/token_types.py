@@ -52,6 +52,7 @@ class TokenType(Enum):
     KEYWORD_ELSE = auto()  # 'else'
     KEYWORD_BREAK = auto()  # 'break'
     KEYWORD_CONTINUE = auto()  # 'continue'
+    KEYWORD_RETURN = auto()  # 'return'
     KEYWORD_C = auto()  # 'c' for curried functions
     KEYWORD_LEN = auto()  # 'len'
     KEYWORD_HEAD = auto()  # 'head'

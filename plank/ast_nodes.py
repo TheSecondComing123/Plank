@@ -163,6 +163,11 @@ class ContinueStatement(AST):
 
 
 @dataclass(slots=True)
+class Return(AST):
+        value: AST | None = None
+
+
+@dataclass(slots=True)
 class TypeCast(AST):
         expr: AST
         type_token: Token
