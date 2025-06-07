@@ -64,6 +64,7 @@ class Lexer:
                 '**': EXPONENT,
                 '//<-': FLOOR_DIVIDE_ASSIGN,
                 '/<-': DIVIDE_ASSIGN,
+                '%<-': MODULUS_ASSIGN,
                 '//': FLOOR_DIVIDE,
                 '<-': ASSIGN,
                 '->': ARROW,
@@ -79,6 +80,7 @@ class Lexer:
         SINGLE_OPS = {
                 '*': MULTIPLY,
                 '/': DIVIDE,
+                '%': MODULUS,
                 '<': LT,
                 '>': GT,
                 '-': MINUS,
