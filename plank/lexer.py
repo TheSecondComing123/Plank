@@ -114,9 +114,16 @@ class Lexer:
                 return False
         
         def skip_whitespace(self):
-                """Skip over any whitespace characters."""
-                while self.current_char is not None and self.current_char.isspace():
-                        self.advance()
+                """Skip over whitespace and comments."""
+                while self.current_char is not None:
+                        if self.current_char.isspace():
+                                self.advance()
+                                continue
+                        if self.current_char == '#':
+                                while self.current_char is not None and self.current_char != '\n':
+                                        self.advance()
+                                continue
+                        break
         
         def integer(self):
                 """Parse an integer literal from the input."""
