@@ -59,6 +59,10 @@ class PlankTest(unittest.TestCase):
             Case("my_list <- [10, 'hello', true]; my_list[0] <- 99; out<- my_list[0]; out <- '\\n'", 99),
             Case("my_list <- 50; out <- my_list; out <- '\\n'", 50),
         ],
+        "dicts and sets": [
+            Case("d <- {'a': 1, 'b': 2}; out <- d['b']; out <- '\\n'", 2),
+            Case("out <- len({1,2,3})", 3),
+        ],
         "functions": [
             Case("square <- (x) <- x * x; out <- square(4); out <- '\\n'", 16),
             Case("add <- (a, b) <- a + b; out <- add(10, 20); out <- '\\n'", 30),
