@@ -50,6 +50,8 @@ class TokenType(Enum):
     KEYWORD_WHILE = auto()  # 'while'
     KEYWORD_IF = auto()  # 'if'
     KEYWORD_ELSE = auto()  # 'else'
+    KEYWORD_BREAK = auto()  # 'break'
+    KEYWORD_CONTINUE = auto()  # 'continue'
     KEYWORD_C = auto()  # 'c' for curried functions
     KEYWORD_LEN = auto()  # 'len'
     KEYWORD_HEAD = auto()  # 'head'
