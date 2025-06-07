@@ -136,6 +136,21 @@ class PlankTest(unittest.TestCase):
                         out = output if isinstance(case.expected, str) and case.expected.endswith("\n") else output.rstrip("\n")
                         self.assertEqual(out, expected_str)
 
+    def test_imports(self):
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            lib_path = tmp_path / "lib.plank"
+            use_path = tmp_path / "use_lib.plank"
+            lib_path.write_text("value <- 5\ndouble <- (x) <- x * 2")
+            use_path.write_text(f"import '{lib_path}'\nout <- double(value)")
+
+            code = use_path.read_text()
+            _, output = run(code)
+            self.assertEqual(output, '10')
+
 
 if __name__ == "__main__":
     unittest.main()
