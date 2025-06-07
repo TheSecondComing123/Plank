@@ -13,6 +13,11 @@ class ContinueSignal(Exception):
     pass
 
 
+class ReturnSignal(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
 # --- Interpreter ---
 # Represents a callable function created from a Lambda AST node.
 class Callable:
@@ -61,10 +66,16 @@ class Interpreter:
         result = None
         try:
             if isinstance(func_obj.body, Program):
-                for statement in func_obj.body.statements:
-                    result = self.visit(statement)
+                try:
+                    for statement in func_obj.body.statements:
+                        result = self.visit(statement)
+                except ReturnSignal as rs:
+                    result = rs.value
             else:
-                result = self.visit(func_obj.body)
+                try:
+                    result = self.visit(func_obj.body)
+                except ReturnSignal as rs:
+                    result = rs.value
         finally:
             self.scopes = original_scopes
         return result
@@ -615,6 +626,10 @@ class Interpreter:
 
     def visit_ContinueStatement(self, node):
         raise ContinueSignal()
+
+    def visit_Return(self, node):
+        value = self.visit(node.value) if node.value is not None else None
+        raise ReturnSignal(value)
     
     def interpret(self):
         """Start the interpretation process by parsing the program and visiting its AST."""
