@@ -38,6 +38,7 @@ class Lexer:
                 'break': (KEYWORD_BREAK, 'break'),
                 'continue': (KEYWORD_CONTINUE, 'continue'),
                 'return': (KEYWORD_RETURN, 'return'),
+                'fn': (KEYWORD_FN, 'fn'),
                 'c': (KEYWORD_C, 'c'),
                 'len': (KEYWORD_LEN, 'len'),
                 'head': (KEYWORD_HEAD, 'head'),

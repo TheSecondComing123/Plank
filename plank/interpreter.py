@@ -475,6 +475,13 @@ class Interpreter:
         # This allows the lambda to access variables from where it was defined.
         closure_env = list(self.scopes)  # Create a copy of the scope stack
         return Callable(node.params, node.body, closure_env, is_curried=node.is_curried)
+
+    def visit_FunctionDef(self, node):
+        """Create a named function and store it in the current scope."""
+        closure_env = list(self.scopes)
+        func = Callable(node.params, node.body, closure_env)
+        self.assign_variable(node.name.value, func)
+        return func
     
     def visit_Call(self, node):
         """
