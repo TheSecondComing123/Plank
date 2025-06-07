@@ -41,7 +41,9 @@ The language supports:
 - `for` ranges and `while` loops with `break`/`continue`.
 - Lambda functions, closures and currying (`c` keyword).
 - Conditionals with `if` / `else`.
-- Built‑in helpers such as `len`, `head`, `tail`, `push`, `pop`, `map`, `filter` and more.
+- Built‑in helpers such as `len`, `head`, `tail`, `push`, `pop`, `contains`,
+  `remove`, `insert`, `extend`, `keys`, `values`, `items`, `union`,
+  `intersection`, `difference`, `map`, `filter` and more.
 
 See `plank/tests/test_interpreter.py` for many usage examples.
 
