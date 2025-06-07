@@ -59,8 +59,6 @@ class Parser:
             return ContinueStatement()
         elif self.current_token.type == KEYWORD_RETURN:
             return self.return_statement()
-        elif self.current_token.type == KEYWORD_FN:
-            return self.function_definition()
         elif self.current_token.type == LPAREN:
             # Look ahead for 'for' or 'while' to distinguish loops from expressions
             lexer_pos_backup = self.lexer.pos
@@ -250,30 +248,6 @@ class Parser:
         if self.current_token.type not in (SEMICOLON, RBRACE, EOF):
             expr = self.expression()
         return Return(expr)
-
-    def function_definition(self):
-        """Parses a function definition."""
-        self.eat(KEYWORD_FN)
-        name = self.variable()
-        self.eat(LPAREN)
-        params = []
-        if self.current_token.type == IDENTIFIER:
-            params.append(self.variable())
-            while self.current_token.type == COMMA:
-                self.eat(COMMA)
-                params.append(self.variable())
-        self.eat(RPAREN)
-        self.eat(ARROW)
-        self.eat(LBRACE)
-        body_statements = []
-        while self.current_token.type != RBRACE:
-            body_statements.append(self.statement())
-            while self.current_token.type == SEMICOLON:
-                self.eat(SEMICOLON)
-                if self.current_token.type != RBRACE and self.current_token.type != EOF:
-                    body_statements.append(self.statement())
-        self.eat(RBRACE)
-        return FunctionDef(name, params, Program(body_statements))
     
     def for_statement(self):
         """
