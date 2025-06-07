@@ -322,12 +322,14 @@ class Parser:
     def additive_expression(self):
         """Handles '+' and '-' operators."""
         node = self.multiplicative_expression()
-        while self.current_token.type in (PLUS, MINUS):
+        while self.current_token.type in (PLUS, MINUS, COLON):
             token = self.current_token
             if token.type == PLUS:
                 self.eat(PLUS)
             elif token.type == MINUS:
                 self.eat(MINUS)
+            elif token.type == COLON:
+                self.eat(COLON)
             node = BinOp(left=node, op=token, right=self.multiplicative_expression())
         return node
     
@@ -419,7 +421,10 @@ class Parser:
         token = self.current_token
         if token.type == KEYWORD_IF:
             return self.if_expression()
-        if token.type in (KEYWORD_LEN, KEYWORD_HEAD, KEYWORD_TAIL, KEYWORD_ABS, KEYWORD_MIN, KEYWORD_MAX, KEYWORD_CLAMP):
+        if token.type in (KEYWORD_LEN, KEYWORD_HEAD, KEYWORD_TAIL, KEYWORD_ABS, KEYWORD_MIN, KEYWORD_MAX, KEYWORD_CLAMP,
+                           KEYWORD_PUSH, KEYWORD_POP, KEYWORD_MAP, KEYWORD_FILTER, KEYWORD_FOLDL, KEYWORD_FOLDR,
+                           KEYWORD_SORT, KEYWORD_SPLIT, KEYWORD_JOIN, KEYWORD_FIND, KEYWORD_REPLACE,
+                           KEYWORD_ZIP, KEYWORD_ENUMERATE):
             return self.builtin_call()
         if token.type == INTEGER:
             self.eat(INTEGER)

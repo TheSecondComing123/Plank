@@ -41,6 +41,19 @@ class Lexer:
                 'min': (KEYWORD_MIN, 'min'),
                 'max': (KEYWORD_MAX, 'max'),
                 'clamp': (KEYWORD_CLAMP, 'clamp'),
+                'push': (KEYWORD_PUSH, 'push'),
+                'pop': (KEYWORD_POP, 'pop'),
+                'map': (KEYWORD_MAP, 'map'),
+                'filter': (KEYWORD_FILTER, 'filter'),
+                'foldl': (KEYWORD_FOLDL, 'foldl'),
+                'foldr': (KEYWORD_FOLDR, 'foldr'),
+                'sort': (KEYWORD_SORT, 'sort'),
+                'split': (KEYWORD_SPLIT, 'split'),
+                'join': (KEYWORD_JOIN, 'join'),
+                'find': (KEYWORD_FIND, 'find'),
+                'replace': (KEYWORD_REPLACE, 'replace'),
+                'zip': (KEYWORD_ZIP, 'zip'),
+                'enumerate': (KEYWORD_ENUMERATE, 'enumerate'),
         }
 
         MULTI_OPS = {
@@ -76,6 +89,7 @@ class Lexer:
                 ';': SEMICOLON,
                 '[': LBRACKET,
                 ']': RBRACKET,
+                ':': COLON,
         }
 
         def __init__(self, text):
