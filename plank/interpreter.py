@@ -1,5 +1,6 @@
 import sys
 import math
+from collections.abc import Iterable, Sequence, MutableSequence, Mapping, MutableMapping, MutableSet
 
 from plank.ast_nodes import *
 from plank.token_types import *
@@ -85,17 +86,21 @@ class Interpreter:
         def b_len(x):
             return len(x)
 
-        def b_head(lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: head expects a list")
-            if not lst:
-                raise Exception("Runtime error: head of empty list")
-            return lst[0]
+        def b_head(seq):
+            if not isinstance(seq, Sequence):
+                raise Exception("Runtime error: head expects a sequence")
+            if isinstance(seq, (str, bytes)):
+                if not seq:
+                    raise Exception("Runtime error: head of empty sequence")
+                return seq[0]
+            if not seq:
+                raise Exception("Runtime error: head of empty sequence")
+            return seq[0]
 
-        def b_tail(lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: tail expects a list")
-            return lst[1:]
+        def b_tail(seq):
+            if not isinstance(seq, Sequence):
+                raise Exception("Runtime error: tail expects a sequence")
+            return seq[1:]
 
         def b_abs(x):
             if not isinstance(x, (int, float)):
@@ -113,49 +118,81 @@ class Interpreter:
                 raise Exception("Runtime error: clamp expects numeric arguments")
             return max(lo, min(x, hi))
 
-        def b_push(lst, item):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: push expects a list")
-            lst.append(item)
-            return lst
+        def b_push(container, *items):
+            if isinstance(container, MutableSequence):
+                if len(items) != 1:
+                    raise Exception("Runtime error: push on sequence takes one item")
+                container.append(items[0])
+                return container
+            if isinstance(container, MutableSet):
+                if len(items) != 1:
+                    raise Exception("Runtime error: push on set takes one item")
+                container.add(items[0])
+                return container
+            if isinstance(container, MutableMapping):
+                if len(items) != 2:
+                    raise Exception("Runtime error: push on dict requires key and value")
+                key, value = items
+                container[key] = value
+                return container
+            raise Exception("Runtime error: push expects a mutable sequence, set, or dict")
 
-        def b_pop(lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: pop expects a list")
-            if not lst:
-                raise Exception("Runtime error: pop from empty list")
-            return lst.pop()
+        def b_pop(container, key=None):
+            if isinstance(container, MutableSequence):
+                if key is not None:
+                    raise Exception("Runtime error: pop on sequence takes no key")
+                if not container:
+                    raise Exception("Runtime error: pop from empty sequence")
+                return container.pop()
+            if isinstance(container, MutableSet):
+                if key is not None:
+                    raise Exception("Runtime error: pop on set takes no key")
+                if not container:
+                    raise Exception("Runtime error: pop from empty set")
+                return container.pop()
+            if isinstance(container, MutableMapping):
+                if key is None:
+                    raise Exception("Runtime error: pop for dict requires a key")
+                try:
+                    return container.pop(key)
+                except KeyError:
+                    raise Exception(f"Runtime error: Key {key!r} not found in dictionary.")
+            raise Exception("Runtime error: pop expects a mutable sequence, set, or dict")
 
-        def b_map(func, lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: map expects a list")
-            return [self._call_function(func, [x]) for x in lst]
+        def b_map(func, iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: map expects an iterable")
+            return [self._call_function(func, [x]) for x in iterable]
 
-        def b_filter(func, lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: filter expects a list")
-            return [x for x in lst if self._call_function(func, [x])]
+        def b_filter(func, iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: filter expects an iterable")
+            return [x for x in iterable if self._call_function(func, [x])]
 
-        def b_foldl(func, init, lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: foldl expects a list")
+        def b_foldl(func, init, iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: foldl expects an iterable")
             acc = init
-            for x in lst:
+            for x in iterable:
                 acc = self._call_function(func, [acc, x])
             return acc
 
-        def b_foldr(func, init, lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: foldr expects a list")
+        def b_foldr(func, init, iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: foldr expects an iterable")
             acc = init
-            for x in reversed(lst):
+            seq = list(iterable)
+            for x in reversed(seq):
                 acc = self._call_function(func, [x, acc])
             return acc
 
-        def b_sort(lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: sort expects a list")
-            return sorted(lst)
+        def b_sort(iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: sort expects an iterable")
+            try:
+                return sorted(iterable)
+            except TypeError:
+                raise Exception("Runtime error: elements not comparable for sort")
 
         def b_split(string, delim):
             if not isinstance(string, str) or not isinstance(delim, str):
@@ -179,15 +216,16 @@ class Interpreter:
                 raise Exception("Runtime error: replace expects strings")
             return string.replace(old, new)
 
+
         def b_zip(a, b):
-            if not isinstance(a, list) or not isinstance(b, list):
-                raise Exception("Runtime error: zip expects two lists")
+            if not isinstance(a, Iterable) or not isinstance(b, Iterable):
+                raise Exception("Runtime error: zip expects two iterables")
             return [[x, y] for x, y in zip(a, b)]
 
-        def b_enumerate(lst):
-            if not isinstance(lst, list):
-                raise Exception("Runtime error: enumerate expects a list")
-            return [[i, v] for i, v in enumerate(lst)]
+        def b_enumerate(iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: enumerate expects an iterable")
+            return [[i, v] for i, v in enumerate(iterable)]
 
         def b_round(x):
             if not isinstance(x, (int, float)):
@@ -204,15 +242,21 @@ class Interpreter:
                 raise Exception("Runtime error: ceil expects a number")
             return math.ceil(x)
 
-        def b_sum(lst):
-            if not isinstance(lst, list) or not all(isinstance(i, (int, float)) for i in lst):
+        def b_sum(iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: sum expects an iterable of numbers")
+            seq = list(iterable)
+            if not all(isinstance(i, (int, float)) for i in seq):
                 raise Exception("Runtime error: sum expects a list of numbers")
-            return sum(lst)
+            return sum(seq)
 
-        def b_average(lst):
-            if not isinstance(lst, list) or not lst or not all(isinstance(i, (int, float)) for i in lst):
-                raise Exception("Runtime error: average expects a non-empty list of numbers")
-            return sum(lst) / len(lst)
+        def b_average(iterable):
+            if not isinstance(iterable, Iterable):
+                raise Exception("Runtime error: average expects a non-empty iterable of numbers")
+            seq = list(iterable)
+            if not seq or not all(isinstance(i, (int, float)) for i in seq):
+                raise Exception("Runtime error: average expects a non-empty iterable of numbers")
+            return sum(seq) / len(seq)
 
         def b_range(start, end, step=None):
             if step is None:
@@ -426,22 +470,26 @@ class Interpreter:
         container = self.visit(node.list_expr)
         key = self.visit(node.index_expr)
 
-        if isinstance(container, list):
+        if isinstance(container, Sequence) and not isinstance(container, (str, bytes)):
             if not isinstance(key, int):
-                raise Exception(f"Runtime error: List index must be an integer, got {type(key).__name__}.")
+                raise Exception(
+                    f"Runtime error: Sequence index must be an integer, got {type(key).__name__}."
+                )
             try:
                 return container[key]
             except IndexError:
                 raise Exception(
-                    f"Runtime error: List index {key} out of bounds for list of size {len(container)}."
+                    f"Runtime error: Index {key} out of bounds for sequence of size {len(container)}."
                 )
-        elif isinstance(container, dict):
+        elif isinstance(container, Mapping):
             try:
                 return container[key]
             except KeyError:
                 raise Exception(f"Runtime error: Key {key!r} not found in dictionary.")
         else:
-            raise Exception(f"Runtime error: Cannot index non-list type {type(container).__name__}.")
+            raise Exception(
+                f"Runtime error: Cannot index non-sequence type {type(container).__name__}."
+            )
     
     def visit_ListAssign(self, node):
         """Assign a value to an element at a specific index in a list."""
@@ -449,14 +497,18 @@ class Interpreter:
         # Lookup the list object using the scope chain
         list_obj = self.lookup_variable(list_var_name)
         
-        if not isinstance(list_obj, list):
-            raise Exception(f"Runtime error: Cannot assign to index of non-list variable '{list_var_name}'.")
+        if not isinstance(list_obj, MutableSequence):
+            raise Exception(
+                f"Runtime error: Cannot assign to index of non-sequence variable '{list_var_name}'."
+            )
         
         index_val = self.visit(node.index_expr)
         value_to_assign = self.visit(node.value_expr)
         
         if not isinstance(index_val, int):
-            raise Exception(f"Runtime error: List index must be an integer, got {type(index_val).__name__}.")
+            raise Exception(
+                f"Runtime error: Sequence index must be an integer, got {type(index_val).__name__}."
+            )
         
         try:
             list_obj[index_val] = value_to_assign
